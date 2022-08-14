@@ -13,6 +13,7 @@ archives:
       linux: Linux
       amd64: x86_64
     format: binary
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     meta: false
 checksum:
   name_template: "checksums.txt"

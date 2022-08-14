@@ -24,5 +24,9 @@ That's it.
 
 ## Installation
 
+#### Linux x86_64
 
+```shell
+wget https://github.com/alegrey91/fwdctl/releases/download/v0.1.0/fwdctl_Linux_x86_64 -O fwdctl && chmod +x fwdctl && sudo mv fwdctl /usr/local/bin/
+```
 
