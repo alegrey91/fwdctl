@@ -44,5 +44,3 @@ func getRuleById(ruleId int) (string, error) {
 	}
 	return "", fmt.Errorf("no rule found with id: %d", ruleId)
 }
-
-func cleanRule(rule string) {}
