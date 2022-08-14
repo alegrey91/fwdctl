@@ -28,7 +28,6 @@ func extractRuleInfo(rule string) ([]string, error) {
 	ruleSplit := strings.Split(rule, " ")
 	ruleInfo := make([]string, 6)
 	for id, arg := range ruleSplit {
-		fmt.Println(arg)
 		switch arg {
 		case "-i":
 			ruleInfo[1] = ruleSplit[id+1]

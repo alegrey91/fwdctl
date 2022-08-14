@@ -1,7 +1,6 @@
 package printer
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 
@@ -19,7 +18,6 @@ func (t *Table) PrintResult(ruleList []string) error {
 	table := tablewriter.NewWriter(os.Stdout) 
 	table.SetHeader([]string{"number", "interface", "protocol", "external port", "internal ip", "internal port"})
 	for ruleId, rule := range ruleList {
-		fmt.Println(rule)
 		tabRule, err := extractRuleInfo(rule)
 		if err != nil {
 			continue
