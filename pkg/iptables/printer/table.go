@@ -1,17 +1,30 @@
 package printer
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/olekukonko/tablewriter"
 )
 
-func PrintResult(ruleList []string) {
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"number", "external port", "internal IP", "internal port", "protocol"})
+type Table struct {
+}
+
+func NewTable() *Table {
+	return &Table{}
+}
+
+func (t *Table) PrintResult(ruleList []string) error {
+	table := tablewriter.NewWriter(os.Stdout) 
+	table.SetHeader([]string{"number", "interface", "protocol", "external port", "internal ip", "internal port"})
 	for _, rule := range ruleList {
-		//table.Append(rule)
-		
+		fmt.Println(rule)
+		tabRule, err := extractRuleInfo(rule)
+		if err != nil {
+			return err
+		}
+		table.Append(tabRule)
 	}
 	table.Render()
+	return nil
 }

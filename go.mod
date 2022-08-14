@@ -7,6 +7,8 @@ require (
 	github.com/spf13/cobra v1.5.0
 )
 
+require github.com/mattn/go-runewidth v0.0.9 // indirect
+
 require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5
