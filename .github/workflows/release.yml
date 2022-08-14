@@ -33,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: fwdctl
-          path: fwdctl
+          path: dist/fwdctl_*
