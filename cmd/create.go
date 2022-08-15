@@ -34,7 +34,7 @@ var (
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:        "create",
-	Aliases:    []string{},
+	Aliases:    []string{"add"},
 	SuggestFor: []string{},
 	Short:      "Create forward using IPTables util",
 	Long: `Create forward rule using IPTables util under the hood.

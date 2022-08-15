@@ -30,6 +30,7 @@ var (
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
+	Aliases:    []string{"rm"},
 	Short: "Delete forward by passing Id number",
 	Long: `Delete forward by passing Id number.
 The Id number is retrieved using the command:

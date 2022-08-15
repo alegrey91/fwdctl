@@ -30,6 +30,7 @@ var (
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
+	Aliases: []string{"ls"},
 	Short: "list forwards",
 	Long: `list forwards made with iptables`,
 	Example: c.ProgramName + "list -o table",
