@@ -49,5 +49,8 @@ func init() {
 	rootCmd.AddCommand(deleteCmd)
 
 	deleteCmd.Flags().IntVarP(&ruleId, "rule-id", "n", 0, "rule number")
-	deleteCmd.MarkFlagRequired("rule-id")
+	err := deleteCmd.MarkFlagRequired("rule-id")
+	if err != nil {
+		fmt.Printf("error: %v", err)
+	}
 }

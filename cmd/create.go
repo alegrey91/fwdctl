@@ -67,11 +67,20 @@ func init() {
 	createCmd.Flags().StringVarP(&proto, "proto", "P", "tcp", "protocol")
 
 	createCmd.Flags().IntVarP(&dport, "destination-port", "d", 0, "destination port")
-	createCmd.MarkFlagRequired("destination-port")
+	err := createCmd.MarkFlagRequired("destination-port")
+	if err != nil {
+		fmt.Printf("error: %v", err)
+	}
 
 	createCmd.Flags().StringVarP(&saddr, "source-address", "s", "", "source address")
-	createCmd.MarkFlagRequired("source-address")
+	err = createCmd.MarkFlagRequired("source-address")
+	if err != nil {
+		fmt.Printf("error: %v", err)
+	}
 
 	createCmd.Flags().IntVarP(&sport, "source-port", "p", 0, "source port")
-	createCmd.MarkFlagRequired("source-port")
+	err = createCmd.MarkFlagRequired("source-port")
+	if err != nil {
+		fmt.Printf("error: %v", err)
+	}
 }
