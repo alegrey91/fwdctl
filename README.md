@@ -22,6 +22,8 @@ sudo fwdctl create --destination-port 3000 --source-address 192.168.199.105 --so
 
 That's it.
 
+Full **documentation** [here](docs/getting-started.md).
+
 ## Installation
 
 #### Linux x86_64
