@@ -7,7 +7,7 @@
 The `apply` command is used to apply rules from a rules file. Here's a rules file example.
 
 ```shell
-cat << EOF > .fwdctl.yml
+cat << EOF > rules.yml
 rules:
   - dport: 2022
     saddr: 192.168.122.43
