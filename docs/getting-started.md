@@ -75,6 +75,25 @@ The output will look like this:
 +--------+-----------+----------+---------------+----------------+---------------+
 ```
 
+### Generate
+
+The `generate` command is used to generate the following files:
+
+* **systemd** service for `fwdctl`
+* rules empty file
+
+To generate a systemd service, type the following command:
+
+```shell
+fwdctl generate systemd -o fwdctl.service
+```
+
+To generate a `fwdctl` rules file, instead, type the following command:
+
+```shell
+fwdctl generate rules -o rules.yml
+```
+
 ### Version
 
 The `version` command is used show the version of the program.
