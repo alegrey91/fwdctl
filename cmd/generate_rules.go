@@ -18,34 +18,24 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/alegrey91/fwdctl/pkg/template"
 	"github.com/spf13/cobra"
 )
 
 // generateRulesCmd represents the generateRules command
 var generateRulesCmd = &cobra.Command{
 	Use:   "rules",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "generates empty rules file",
+	Long: `generates empty rules file
+`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("generateRules called")
+		err := template.GetRuleTemplate(outputFile)
+		if err != nil {
+			fmt.Println(err)
+		}
 	},
 }
 
 func init() {
 	generateCmd.AddCommand(generateRulesCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// generateRulesCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// generateRulesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
