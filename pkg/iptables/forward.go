@@ -44,7 +44,7 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 	}
 
 	// apply provided rule
-	err = ipt.Append(fwdTable, fwdChain, ruleSpec...)
+	err = ipt.AppendUnique(fwdTable, fwdChain, ruleSpec...)
 	if err != nil {
 		return fmt.Errorf("rule failed: %v", err)
 	}
