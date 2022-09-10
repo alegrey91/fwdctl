@@ -1,5 +1,9 @@
 package rules
 
+import (
+	"github.com/alegrey91/fwdctl/pkg/iptables"
+)
+
 // RulesFile keep track of listed rules
 // the result looks like so:
 // rules:
@@ -11,13 +15,5 @@ package rules
 //   - iface: eth0
 //     ...
 type RulesFile struct {
-	Rules []Rule `yaml:"rules"`
-}
-
-type Rule struct {
-	Iface string `yaml:"iface"`
-	Proto string `yaml:"proto"`
-	Dport int    `yaml:"dport"`
-	Saddr string `yaml:"saddr"`
-	Sport int    `yaml:"sport"`
+	Rules []iptables.Rule `yaml:"rules"`
 }

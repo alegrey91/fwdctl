@@ -20,7 +20,7 @@ import (
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	ipt "github.com/alegrey91/fwdctl/pkg/iptables"
-	"github.com/alegrey91/fwdctl/pkg/rules"
+	"github.com/alegrey91/fwdctl/internal/rules"
 	"github.com/spf13/cobra"
 )
 

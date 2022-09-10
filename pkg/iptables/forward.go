@@ -14,15 +14,23 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 		return fmt.Errorf("failed: %v", err)
 	}
 
+	rule := Rule{
+		Iface: iface,
+		Proto: proto,
+		Dport: dport,
+		Saddr: saddr,
+		Sport: sport,
+	}
+
 	// example rule:
 	// iptables -t nat -A PREROUTING -i eth0 -p tcp -m tcp --dport 3000 -j DNAT --to-destination 192.168.199.105:80
 	ruleSpec := []string{
-		"-i", iface,
-		"-p", proto,
-		"-m", proto,
-		"--dport", strconv.Itoa(dport),
+		"-i", rule.Iface,
+		"-p", rule.Proto,
+		"-m", rule.Proto,
+		"--dport", strconv.Itoa(rule.Dport),
 		"-j", fwdTarget,
-		"--to-destination", saddr + ":" + strconv.Itoa(sport),
+		"--to-destination", rule.Saddr + ":" + strconv.Itoa(rule.Sport),
 	}
 
 	// check if input interface exists on the system
