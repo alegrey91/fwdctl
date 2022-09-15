@@ -3,7 +3,7 @@ module github.com/alegrey91/fwdctl
 go 1.18
 
 require (
-	github.com/coreos/go-iptables v0.6.0
+	github.com/coreos/go-iptables v0.6.1-0.20220901214115-d2b8608923d1
 	github.com/spf13/cobra v1.5.0
 )
 
