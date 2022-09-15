@@ -87,7 +87,7 @@ func DeleteForward(ruleId int) error {
 
 	// retrieve rule using Id number
 	// (sudo iptables -t nat -L PREROUTING -n --line-numbers)
-	rule, err := getRuleById(ruleId)
+	rule, err := ipt.ListById(fwdTable, fwdChain, ruleId)
 	if err != nil {
 		return fmt.Errorf("unable to retrieve rule with ID: %d", ruleId)
 	}
