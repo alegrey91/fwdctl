@@ -2,7 +2,9 @@ package template
 
 import (
 	_ "embed"
+	"fmt"
 	"os"
+	"path/filepath"
 	"text/template"
 )
 
@@ -10,16 +12,11 @@ import (
 var systemdServiceTpl string
 
 type SystemdService struct {
-    InstallationPath string
-    RulesFile string
+	InstallationPath string
+	RulesFile        string
 }
 
-func GetSystemdTemplate(toOutput string, installationPath string, rulesFile string) error {
-	systemdSvc := SystemdService{
-		InstallationPath: installationPath,
-		RulesFile: rulesFile,
-	}
-
+func (systemdSvc *SystemdService) GenerateTemplate(toOutput string) error {
 	tpl, err := template.New("systemd").Parse(systemdServiceTpl)
 	if err != nil {
 		return err
@@ -27,6 +24,9 @@ func GetSystemdTemplate(toOutput string, installationPath string, rulesFile stri
 
 	if toOutput == "" {
 		return nil
+	}
+	if !filepath.IsAbs(toOutput) {
+		return fmt.Errorf("output path is not absolute")
 	}
 
 	outFile, err := os.Create(toOutput)

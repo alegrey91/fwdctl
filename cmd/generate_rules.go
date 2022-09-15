@@ -29,7 +29,8 @@ var generateRulesCmd = &cobra.Command{
 	Long: `generates empty rules file
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := template.GetRuleTemplate(outputFile)
+		rule := template.Rule{}
+		err := rule.GenerateTemplate(outputFile)
 		if err != nil {
 			fmt.Println(err)
 		}
