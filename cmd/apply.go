@@ -19,13 +19,9 @@ import (
 	"fmt"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
-	ipt "github.com/alegrey91/fwdctl/pkg/iptables"
 	"github.com/alegrey91/fwdctl/internal/rules"
+	ipt "github.com/alegrey91/fwdctl/pkg/iptables"
 	"github.com/spf13/cobra"
-)
-
-var (
-	rulesFile string
 )
 
 // applyCmd represents the apply command
@@ -35,7 +31,7 @@ var applyCmd = &cobra.Command{
 	Long:    `apply rules described in a configuration file`,
 	Example: c.ProgramName + " apply --rule-file rule.yml",
 	Run: func(cmd *cobra.Command, args []string) {
-		rulesFile, err := rules.NewRulesFile(rulesFile)
+		rulesFile, err := rules.NewRulesFile(c.RulesFile)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -52,5 +48,5 @@ var applyCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(applyCmd)
 
-	applyCmd.Flags().StringVarP(&rulesFile, "rules-file", "r", "rules.yml", "rules file")
+	applyCmd.Flags().StringVarP(&c.RulesFile, "rules-file", "r", "rules.yml", "rules file")
 }

@@ -18,12 +18,12 @@ package cmd
 import (
 	"fmt"
 
+	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/pkg/template"
 	"github.com/spf13/cobra"
 )
 
-var installationPathGen string
-var rulesFileGen string
+var installationPath string
 
 // generateSystemdCmd represents the generateSystemd command
 var generateSystemdCmd = &cobra.Command{
@@ -32,7 +32,11 @@ var generateSystemdCmd = &cobra.Command{
 	Long: `generates systemd service file to run fwdctl at boot
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := template.GetSystemdTemplate(outputFile, installationPathGen, rulesFileGen)
+		systemd := template.SystemdService{
+			InstallationPath: installationPath,
+			RulesFile: c.RulesFile,
+		}
+		err := systemd.GenerateTemplate(outputFile)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -43,6 +47,6 @@ func init() {
 	generateCmd.AddCommand(generateSystemdCmd)
 	
 
-	generateSystemdCmd.Flags().StringVarP(&installationPathGen, "installation-path", "p", "/usr/local/bin", "fwdctl installation path")
-	generateSystemdCmd.Flags().StringVarP(&rulesFileGen, "rules-file", "r", "~/rules.yml", "rules file")
+	generateSystemdCmd.Flags().StringVarP(&installationPath, "installation-path", "p", "/usr/local/bin", "fwdctl installation path")
+	generateSystemdCmd.Flags().StringVarP(&c.RulesFile, "rules-file", "r", "~/rules.yml", "rules file")
 }
