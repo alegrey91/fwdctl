@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/alegrey91/fwdctl/pkg/template"
+	rt "github.com/alegrey91/fwdctl/pkg/template/rules_template"
 	"github.com/spf13/cobra"
 )
 
@@ -29,8 +30,8 @@ var generateRulesCmd = &cobra.Command{
 	Long: `generates empty rules file
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		rule := template.Rule{}
-		err := rule.GenerateTemplate(outputFile)
+		rules := rt.NewRules()
+		err := template.GenerateTemplate(rules, outputFile)
 		if err != nil {
 			fmt.Println(err)
 		}

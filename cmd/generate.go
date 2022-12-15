@@ -45,5 +45,10 @@ var generateCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(generateCmd)
 
-	generateCmd.PersistentFlags().StringVarP(&outputFile, "output", "o", "", "output file")
+	generateCmd.PersistentFlags().StringVarP(&outputFile, "output", "o", "", "output path")
+	err := generateCmd.MarkPersistentFlagRequired("output")
+	if err != nil {
+		fmt.Println(err.Error())
+        return	
+	}
 }

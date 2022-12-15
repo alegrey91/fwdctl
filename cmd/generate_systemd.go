@@ -20,6 +20,7 @@ import (
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/pkg/template"
+	st "github.com/alegrey91/fwdctl/pkg/template/systemd_template"
 	"github.com/spf13/cobra"
 )
 
@@ -32,11 +33,8 @@ var generateSystemdCmd = &cobra.Command{
 	Long: `generates systemd service file to run fwdctl at boot
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		systemd := template.SystemdService{
-			InstallationPath: installationPath,
-			RulesFile: c.RulesFile,
-		}
-		err := systemd.GenerateTemplate(outputFile)
+		systemd := st.NewSystemdService(installationPath, c.RulesFile)
+		err := template.GenerateTemplate(systemd, outputFile)
 		if err != nil {
 			fmt.Println(err)
 		}
