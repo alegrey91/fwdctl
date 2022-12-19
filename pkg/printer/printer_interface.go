@@ -13,6 +13,8 @@ func NewPrinter(printFormat string) Printer {
 	switch printFormat {
 	case "table":
 		return NewTable()
+	case "json":
+		return NewJson()
 	default:
 		return NewTable()
 	}
