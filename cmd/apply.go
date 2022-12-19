@@ -36,10 +36,10 @@ var applyCmd = &cobra.Command{
 			fmt.Println(err)
 		}
 
-		for _, rule := range rulesFile.Rules {
+		for ruleId, rule := range rulesFile.Rules {
 			err = ipt.CreateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Printf("rule#%d - %v\n", ruleId, err)
 			}
 		}
 	},
