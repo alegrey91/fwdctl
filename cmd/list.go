@@ -20,6 +20,7 @@ import (
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	ipt "github.com/alegrey91/fwdctl/pkg/iptables"
+	"github.com/alegrey91/fwdctl/pkg/printer"
 	"github.com/spf13/cobra"
 )
 
@@ -29,15 +30,21 @@ var (
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
-	Use:   "list",
+	Use:     "list",
 	Aliases: []string{"ls"},
-	Short: "list forwards",
-	Long: `list forwards made with iptables`,
+	Short:   "list forwards",
+	Long:    `list forwards made with iptables`,
 	Example: c.ProgramName + "list -o table",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := ipt.ListForward(format)
+		ruleList, err := ipt.ListForward(format)
 		if err != nil {
 			fmt.Println(err)
+		}
+
+		p := printer.NewPrinter(format)
+		err = p.PrintResult(ruleList)
+		if err != nil {
+			fmt.Printf("failed printing results: %v", err)
 		}
 	},
 }

@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/alegrey91/fwdctl/pkg/iptables/printer"
 )
 
 func validateIface(iface string) error {
@@ -120,24 +118,19 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 	return nil
 }
 
-func ListForward(outputFormat string) error {
+func ListForward(outputFormat string) ([]string, error) {
 	ipt, err := getIPTablesInstance()
 	if err != nil {
-		return fmt.Errorf("failed: %v", err)
+		return nil, fmt.Errorf("failed: %v", err)
 	}
 
 	//ruleList, err := ipt.ListWithCounters(fwdTable, fwdChain)
 	ruleList, err := ipt.List(fwdTable, fwdChain)
 	if err != nil {
-		return fmt.Errorf("failed: %v", err)
+		return nil, fmt.Errorf("failed: %v", err)
 	}
 	
-	p := printer.NewPrinter(outputFormat)
-	err = p.PrintResult(ruleList)
-	if err != nil {
-		return fmt.Errorf("failed printing results: %v", err)
-	}
-	return nil
+	return ruleList, nil
 }
 
 func DeleteForward(ruleId int) error {
