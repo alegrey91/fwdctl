@@ -1,8 +1,8 @@
 package iptables
 
 type Rule struct {
-	Iface string
-	Proto string
+	Iface string `default:"lo"`
+	Proto string `default:"tcp"`
 	Dport int
 	Saddr string
 	Sport int

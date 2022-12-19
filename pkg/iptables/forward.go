@@ -8,6 +8,62 @@ import (
 	"github.com/alegrey91/fwdctl/pkg/iptables/printer"
 )
 
+func validateIface(iface string) error {
+	if iface == "" {
+		return fmt.Errorf("inteface name is empty")
+	}
+	return nil
+}
+
+func validateProto(proto string) error {
+	if proto == "" {
+		return fmt.Errorf("protocol name is empty")
+	}
+	if (proto != "tcp") && (proto != "udp") && (proto != "icmp") {
+		return fmt.Errorf("protocol name not allowed")
+	}
+	return nil
+}
+
+func validatePort(port int) error {
+	if port < 1 || port > 65535 {
+		return fmt.Errorf("port number not allowed")
+	}
+	return nil
+}
+
+func validateAddress(address string) error {
+	return nil
+}
+
+func ValidateForward(iface string, proto string, dport int, saddr string, sport int) error {
+	err := validateIface(iface)
+	if err != nil {
+		return fmt.Errorf("interface: '%s' %v", iface, err)
+	}	
+
+	err = validateProto(proto)
+	if err != nil {
+		return fmt.Errorf("protocol: '%s' %v", proto, err)
+	}	
+
+	err = validatePort(dport)
+	if err != nil {
+		return fmt.Errorf("destination port: '%d' %v", dport, err)
+	}	
+
+	err = validateAddress(saddr)
+	if err != nil {
+		return fmt.Errorf("source address: '%s' %v", saddr, err)
+	}	
+
+	err = validatePort(sport)
+	if err != nil {
+		return fmt.Errorf("source port: '%d' %v", sport, err)
+	}	
+	return nil
+}
+
 func CreateForward(iface string, proto string, dport int, saddr string, sport int) error {
 	ipt, err := getIPTablesInstance()
 	if err != nil {
@@ -31,6 +87,11 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 		"--dport", strconv.Itoa(rule.Dport),
 		"-j", fwdTarget,
 		"--to-destination", rule.Saddr + ":" + strconv.Itoa(rule.Sport),
+	}
+
+	err = ValidateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+	if err != nil {
+		return fmt.Errorf("validation error: %v", err)
 	}
 
 	// check if input interface exists on the system
