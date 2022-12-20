@@ -15,6 +15,8 @@ func NewPrinter(printFormat string) Printer {
 		return NewTable()
 	case "json":
 		return NewJson()
+	case "yaml":
+		return NewYaml()
 	default:
 		return NewTable()
 	}
