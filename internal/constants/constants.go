@@ -1,7 +1,7 @@
 package constants
 
 const (
-	Version     = "0.3.3"
+	Version     = "0.4"
 	ProgramName = "fwdctl"
 )
 
