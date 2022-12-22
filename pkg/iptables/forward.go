@@ -38,27 +38,27 @@ func ValidateForward(iface string, proto string, dport int, saddr string, sport 
 	err := validateIface(iface)
 	if err != nil {
 		return fmt.Errorf("interface: '%s' %v", iface, err)
-	}	
+	}
 
 	err = validateProto(proto)
 	if err != nil {
 		return fmt.Errorf("protocol: '%s' %v", proto, err)
-	}	
+	}
 
 	err = validatePort(dport)
 	if err != nil {
 		return fmt.Errorf("destination port: '%d' %v", dport, err)
-	}	
+	}
 
 	err = validateAddress(saddr)
 	if err != nil {
 		return fmt.Errorf("source address: '%s' %v", saddr, err)
-	}	
+	}
 
 	err = validatePort(sport)
 	if err != nil {
 		return fmt.Errorf("source port: '%d' %v", sport, err)
-	}	
+	}
 	return nil
 }
 
@@ -68,26 +68,18 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 		return fmt.Errorf("failed: %v", err)
 	}
 
-	rule := Rule{
-		Iface: iface,
-		Proto: proto,
-		Dport: dport,
-		Saddr: saddr,
-		Sport: sport,
-	}
-
 	// example rule:
 	// iptables -t nat -A PREROUTING -i eth0 -p tcp -m tcp --dport 3000 -j DNAT --to-destination 192.168.199.105:80
 	ruleSpec := []string{
-		"-i", rule.Iface,
-		"-p", rule.Proto,
-		"-m", rule.Proto,
-		"--dport", strconv.Itoa(rule.Dport),
+		"-i", iface,
+		"-p", proto,
+		"-m", proto,
+		"--dport", strconv.Itoa(dport),
 		"-j", fwdTarget,
-		"--to-destination", rule.Saddr + ":" + strconv.Itoa(rule.Sport),
+		"--to-destination", saddr + ":" + strconv.Itoa(sport),
 	}
 
-	err = ValidateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+	err = ValidateForward(iface, proto, dport, saddr, sport)
 	if err != nil {
 		return fmt.Errorf("validation error: %v", err)
 	}
@@ -129,11 +121,11 @@ func ListForward(outputFormat string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed: %v", err)
 	}
-	
+
 	return ruleList, nil
 }
 
-func DeleteForward(ruleId int) error {
+func DeleteForwardById(ruleId int) error {
 	ipt, err := getIPTablesInstance()
 	if err != nil {
 		return fmt.Errorf("failed: %v", err)
@@ -153,7 +145,30 @@ func DeleteForward(ruleId int) error {
 	// delete rule
 	err = ipt.Delete(fwdTable, fwdChain, ruleSplit...)
 	if err != nil {
-		return fmt.Errorf("failed deleting rule n. %d\n err: %v", ruleId, err)
+		return fmt.Errorf("failed deleting rule #%d\n err: %v", ruleId, err)
+	}
+	return nil
+}
+
+func DeleteForwardByRule(iface string, proto string, dport int, saddr string, sport int) error {
+	ipt, err := getIPTablesInstance()
+	if err != nil {
+		return fmt.Errorf("failed: %v", err)
+	}
+
+	// TODO: create function to return []string with packed rule, passing iface, proto, etc as arguments.
+	ruleSpec := []string{
+		"-i", iface,
+		"-p", proto,
+		"-m", proto,
+		"--dport", strconv.Itoa(dport),
+		"-j", fwdTarget,
+		"--to-destination", saddr + ":" + strconv.Itoa(sport),
+	}
+
+	err = ipt.Delete(fwdTable, fwdChain, ruleSpec...)
+	if err != nil {
+		return fmt.Errorf("failed deleting rule: '%s'\n err: %v", ruleSpec, err)
 	}
 	return nil
 }

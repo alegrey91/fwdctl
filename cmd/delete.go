@@ -17,31 +17,50 @@ package cmd
 
 import (
 	"fmt"
+	//"os"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
+	"github.com/alegrey91/fwdctl/internal/rules"
 	ipt "github.com/alegrey91/fwdctl/pkg/iptables"
 	"github.com/spf13/cobra"
 )
 
 var (
 	ruleId int
+	file   string
 )
 
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
-	Use:   "delete",
-	Aliases:    []string{"rm"},
-	Short: "Delete forward by passing Id number",
-	Long: `Delete forward by passing Id number.
-The Id number is retrieved using the command:
-sudo iptables -t nat -L PREROUTING -n --line-number
+	Use:     "delete",
+	Aliases: []string{"rm"},
+	Short:   "Delete forward",
+	Long: `Delete forward by passing a rule file or rule id.
 `,
 	Example: c.ProgramName + " delete -n 2",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(ruleId)
-		err := ipt.DeleteForward(ruleId)
-		if err != nil {
-			fmt.Println(err)
+
+		// Delete rule number
+		if cmd.Flags().Lookup("by-id").Changed {
+			err := ipt.DeleteForwardById(ruleId)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+
+		// Loop over file content and delete rule one-by-one.
+		if cmd.Flags().Lookup("by-file").Changed {
+			file, _ := cmd.Flags().GetString("by-file")
+			rulesFile, err := rules.NewRulesFile(file)
+			if err != nil {
+				fmt.Println(err)
+			}
+			for _, rule := range rulesFile.Rules {
+				err := ipt.DeleteForwardByRule(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
 		}
 	},
 }
@@ -49,9 +68,7 @@ sudo iptables -t nat -L PREROUTING -n --line-number
 func init() {
 	rootCmd.AddCommand(deleteCmd)
 
-	deleteCmd.Flags().IntVarP(&ruleId, "rule-id", "n", 0, "rule number")
-	err := deleteCmd.MarkFlagRequired("rule-id")
-	if err != nil {
-		fmt.Printf("error: %v", err)
-	}
+	deleteCmd.Flags().IntVarP(&ruleId, "by-id", "n", 0, "delete rule through number")
+	deleteCmd.Flags().StringVarP(&file, "by-file", "f", "", "delete rule through file")
+	deleteCmd.MarkFlagsMutuallyExclusive("by-id", "by-file")
 }

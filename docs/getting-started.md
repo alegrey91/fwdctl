@@ -44,15 +44,23 @@ sudo fwdctl create --destination-port 3000 --source-address 192.168.199.105 --so
 
 ### Delete
 
-The `delete` command is used to delete single rules manually.
+The `delete` command is used to delete rules using their ID or a file where the rules are listed.
 
 To delete a specific rule (identified with a number), type the following command:
 
 ```shell
-sudo fwdctl delete -n 4
+sudo fwdctl delete --by-id 4
 ```
 
 This will remove the rule n. **4**, listed from **iptables**.
+
+To delete a set of rules listed in a *rule file*, type the following command:
+
+```shell
+sudo fwdctl delete --by-file rules.yaml
+```
+
+This will remove the listed rules within the file.
 
 ### List
 
@@ -73,6 +81,12 @@ The output will look like this:
 |      1 | lo        | tcp      |          2022 | 192.168.122.43 |            22 |
 |      2 | lo        | tcp      |          3022 | 192.168.122.44 |           443 |
 +--------+-----------+----------+---------------+----------------+---------------+
+```
+
+If you want to use a different view of applied rules, you can choose between different format:
+
+```shell
+sudo fwdctl list --format json
 ```
 
 ### Generate
