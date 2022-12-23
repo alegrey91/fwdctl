@@ -5,12 +5,10 @@ go 1.18
 require (
 	github.com/coreos/go-iptables v0.6.1-0.20220901214115-d2b8608923d1
 	github.com/spf13/cobra v1.5.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
-require (
-	github.com/mattn/go-runewidth v0.0.9 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
-)
+require github.com/mattn/go-runewidth v0.0.9 // indirect
 
 require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
