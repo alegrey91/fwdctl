@@ -8,6 +8,8 @@ builds:
       - linux
     goarch:
       - amd64
+    ldflags:
+      - -s -w -X github.com/alegrey91/fwdctl/internal/constants.Version={{ .Env.GITHUB_REF_NAME }}
 archives:
   - replacements:
       linux: Linux
