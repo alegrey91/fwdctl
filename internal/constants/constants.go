@@ -1,10 +1,7 @@
 package constants
 
-const (
-	Version     = "0.4"
-	ProgramName = "fwdctl"
-)
-
 var (
+	Version     = "dev"
+	ProgramName = "fwdctl"
 	RulesFile string
 )
