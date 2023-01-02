@@ -20,6 +20,9 @@ jobs:
           check-latest: true
       - run: go version
 
+      - name: Test with go cli
+        run: go test -v ./...
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
