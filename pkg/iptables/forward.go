@@ -31,35 +31,39 @@ func validatePort(port int) error {
 }
 
 func validateAddress(address string) error {
+	// not a valid check for now.
 	return nil
 }
 
-func ValidateForward(iface string, proto string, dport int, saddr string, sport int) error {
+// ValidateForward returns both bool and error.
+// The boolean return true in case the rule passes all checks.
+// In case it does not, then the error will describe the problem.
+func ValidateForward(iface string, proto string, dport int, saddr string, sport int) (bool, error) {
 	err := validateIface(iface)
 	if err != nil {
-		return fmt.Errorf("interface: '%s' %v", iface, err)
+		return false, fmt.Errorf("interface: '%s' %v", iface, err)
 	}
 
 	err = validateProto(proto)
 	if err != nil {
-		return fmt.Errorf("protocol: '%s' %v", proto, err)
+		return false, fmt.Errorf("protocol: '%s' %v", proto, err)
 	}
 
 	err = validatePort(dport)
 	if err != nil {
-		return fmt.Errorf("destination port: '%d' %v", dport, err)
+		return false, fmt.Errorf("destination port: '%d' %v", dport, err)
 	}
 
 	err = validateAddress(saddr)
 	if err != nil {
-		return fmt.Errorf("source address: '%s' %v", saddr, err)
+		return false, fmt.Errorf("source address: '%s' %v", saddr, err)
 	}
 
 	err = validatePort(sport)
 	if err != nil {
-		return fmt.Errorf("source port: '%d' %v", sport, err)
+		return false, fmt.Errorf("source port: '%d' %v", sport, err)
 	}
-	return nil
+	return true, nil
 }
 
 func CreateForward(iface string, proto string, dport int, saddr string, sport int) error {
@@ -79,7 +83,7 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 		"--to-destination", saddr + ":" + strconv.Itoa(sport),
 	}
 
-	err = ValidateForward(iface, proto, dport, saddr, sport)
+	_, err = ValidateForward(iface, proto, dport, saddr, sport)
 	if err != nil {
 		return fmt.Errorf("validation error: %v", err)
 	}
