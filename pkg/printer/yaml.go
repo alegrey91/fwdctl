@@ -18,7 +18,7 @@ func NewYaml() *Yaml {
 }
 
 func (y *Yaml) PrintResult(ruleList []string) error {
-	rules := rules.RulesFile{}
+	rules := rules.NewRuleSet()
 	for _, rule := range ruleList {
 		jsonRule, err := extractRuleInfo(rule)
 		if err != nil {
@@ -40,7 +40,7 @@ func (y *Yaml) PrintResult(ruleList []string) error {
 			Saddr: jsonRule[4],
 			Sport: sport,
 		}
-		rules.Rules = append(rules.Rules, rule)
+		rules.Add(rule)
 	}
 	val, err := yaml.Marshal(rules.Rules)
 	if err != nil {
