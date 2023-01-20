@@ -51,7 +51,7 @@ var deleteCmd = &cobra.Command{
 		// Loop over file content and delete rule one-by-one.
 		if cmd.Flags().Lookup("by-file").Changed {
 			file, _ := cmd.Flags().GetString("by-file")
-			rulesFile, err := rules.NewRulesFile(file)
+			rulesFile, err := rules.NewRuleSetFromFile(file)
 			if err != nil {
 				fmt.Println(err)
 			}

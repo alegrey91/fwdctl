@@ -14,6 +14,12 @@ import (
 //     sport: 22
 //   - iface: eth0
 //     ...
-type RulesFile struct {
+type RuleSet struct {
+	//Rules []iptables.Rule `yaml:"rules"`
+	Rules map[string]iptables.Rule `yaml:"rules"`
+}
+
+// Struct to support creation of RuleSet
+type supportRuleSet struct {
 	Rules []iptables.Rule `yaml:"rules"`
 }
