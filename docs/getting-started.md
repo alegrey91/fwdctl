@@ -25,7 +25,7 @@ EOF
 Once created, you can easily run:
 
 ```shell
-sudo fwdctl apply --rules-file rules.yml
+sudo fwdctl apply --file rules.yml
 ```
 
 and apply all the rules listed in the file.
@@ -42,6 +42,30 @@ To implement the rule for this scenario, just type the following command:
 sudo fwdctl create --destination-port 3000 --source-address 192.168.199.105 --source-port 80
 ```
 
+### Daemon
+
+The `daemon` command is used to run `fwdctl` as service.
+
+When modifications are applied to the rules file, `fwdctl` is triggered and start to apply changes that have been requested.
+
+To start the daemon, run the following command:
+
+```shell
+sudo fwdctl daemon start -f rules.yaml
+```
+
+When you want to stop the daemon execution, then type:
+
+```shell
+sudo fwdctl daemon stop
+```
+
+This will remove all the forwards that have been applied during its execution.
+
+Here's a demo on how to use this command:
+
+[![asciicast](https://asciinema.org/a/553296.svg)](https://asciinema.org/a/553296)
+
 ### Delete
 
 The `delete` command is used to delete rules using their ID or a file where the rules are listed.
@@ -49,7 +73,7 @@ The `delete` command is used to delete rules using their ID or a file where the 
 To delete a specific rule (identified with a number), type the following command:
 
 ```shell
-sudo fwdctl delete --by-id 4
+sudo fwdctl delete --id 4
 ```
 
 This will remove the rule n. **4**, listed from **iptables**.
@@ -57,7 +81,7 @@ This will remove the rule n. **4**, listed from **iptables**.
 To delete a set of rules listed in a *rule file*, type the following command:
 
 ```shell
-sudo fwdctl delete --by-file rules.yaml
+sudo fwdctl delete --file rules.yaml
 ```
 
 This will remove the listed rules within the file.
@@ -86,7 +110,7 @@ The output will look like this:
 If you want to use a different view of applied rules, you can choose between different format:
 
 ```shell
-sudo fwdctl list --format json
+sudo fwdctl list --output json
 ```
 
 ### Generate
