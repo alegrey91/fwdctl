@@ -52,7 +52,9 @@ func Start(rulesFile string) {
 		errorLogger.Println(err)
 		os.Exit(1)
 	}
-	defer removePidFile()
+	defer func() {
+		err = removePidFile()
+	}()
 	infoLogger.Println("PID file created")
 
 	// preparing rule set from rules file
@@ -122,5 +124,8 @@ func Stop() {
 	if err != nil {
 		errorLogger.Println(err)
 	}
-	syscall.Kill(pid, syscall.SIGTERM)
+	err = syscall.Kill(pid, syscall.SIGTERM)
+	if err != nil {
+		errorLogger.Println(err)
+	}
 }
