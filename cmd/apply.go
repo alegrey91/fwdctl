@@ -31,12 +31,12 @@ var applyCmd = &cobra.Command{
 	Long:    `apply rules described in a configuration file`,
 	Example: c.ProgramName + " apply --rule-file rule.yml",
 	Run: func(cmd *cobra.Command, args []string) {
-		rulesSet, err := rules.NewRuleSetFromFile(c.RulesFile)
+		ruleSet, err := rules.NewRuleSetFromFile(c.RulesFile)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		for ruleId, rule := range rulesSet.Rules {
+		for ruleId, rule := range ruleSet.Rules {
 			err = ipt.CreateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
 			if err != nil {
 				fmt.Printf("rule#%s - %v\n", ruleId, err)

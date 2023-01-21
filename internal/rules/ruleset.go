@@ -66,10 +66,10 @@ func (rs *RuleSet) Remove(ruleHash string) {
 	delete(rs.Rules, ruleHash)
 }
 
-// ApplyChanges add and remove rules based on the differences
+// Diff add and remove rules based on the differences
 // between the old and current rules set.
 // Return an error in case of fail, nil otherwise.
-func (rs *RuleSet) ApplyChanges(oldRS *RuleSet) error {
+func (rs *RuleSet) Diff(oldRS *RuleSet) error {
 	// loop over old rules set, to find rules to be removed
 	for hash := range oldRS.Rules {
 		// if key in oldRules is not present in rs,
