@@ -16,6 +16,9 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
+	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/internal/daemon"
 	"github.com/spf13/cobra"
 )
@@ -26,11 +29,15 @@ var daemonStartCmd = &cobra.Command{
 	Short: "Start fwdctl daemon",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		daemon.Start()
+		rulesFile, err := cmd.Flags().GetString("rules-file")
+		if err != nil {
+			fmt.Println(err)
+		}
+		daemon.Start(rulesFile)
 	},
 }
 
 func init() {
 	daemonCmd.AddCommand(daemonStartCmd)
-
+	daemonStartCmd.Flags().StringVarP(&c.RulesFile, "rules-file", "r", "rules.yml", "rules file")
 }
