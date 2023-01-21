@@ -39,5 +39,5 @@ var daemonStartCmd = &cobra.Command{
 
 func init() {
 	daemonCmd.AddCommand(daemonStartCmd)
-	daemonStartCmd.Flags().StringVarP(&c.RulesFile, "rules-file", "r", "rules.yml", "rules file")
+	daemonStartCmd.Flags().StringVarP(&c.RulesFile, "file", "f", "rules.yml", "rules file")
 }

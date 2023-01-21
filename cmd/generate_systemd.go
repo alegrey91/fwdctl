@@ -46,5 +46,5 @@ func init() {
 	
 
 	generateSystemdCmd.Flags().StringVarP(&installationPath, "installation-path", "p", "/usr/local/bin", "fwdctl installation path")
-	generateSystemdCmd.Flags().StringVarP(&c.RulesFile, "rules-file", "r", "~/rules.yml", "rules file")
+	generateSystemdCmd.Flags().StringVarP(&c.RulesFile, "file", "f", "rules.yml", "rules file")
 }
