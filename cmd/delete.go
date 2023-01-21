@@ -68,7 +68,7 @@ var deleteCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(deleteCmd)
 
-	deleteCmd.Flags().IntVarP(&ruleId, "by-id", "n", 0, "delete rule through number")
-	deleteCmd.Flags().StringVarP(&file, "by-file", "f", "", "delete rule through file")
-	deleteCmd.MarkFlagsMutuallyExclusive("by-id", "by-file")
+	deleteCmd.Flags().IntVarP(&ruleId, "id", "n", 0, "delete rule through number")
+	deleteCmd.Flags().StringVarP(&file, "file", "f", "", "delete rule through rules file")
+	deleteCmd.MarkFlagsMutuallyExclusive("id", "file")
 }

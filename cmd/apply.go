@@ -48,5 +48,5 @@ var applyCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(applyCmd)
 
-	applyCmd.Flags().StringVarP(&c.RulesFile, "rules-file", "r", "rules.yml", "rules file")
+	applyCmd.Flags().StringVarP(&c.RulesFile, "file", "f", "rules.yml", "rules file")
 }
