@@ -25,6 +25,7 @@ import (
 )
 
 var installationPath string
+var serviceType      string
 
 // generateSystemdCmd represents the generateSystemd command
 var generateSystemdCmd = &cobra.Command{
@@ -33,7 +34,7 @@ var generateSystemdCmd = &cobra.Command{
 	Long: `generates systemd service file to run fwdctl at boot
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		systemd := st.NewSystemdService(installationPath, c.RulesFile)
+		systemd := st.NewSystemdService(serviceType, installationPath, c.RulesFile)
 		err := template.GenerateTemplate(systemd, outputFile)
 		if err != nil {
 			fmt.Println(err)
@@ -43,8 +44,8 @@ var generateSystemdCmd = &cobra.Command{
 
 func init() {
 	generateCmd.AddCommand(generateSystemdCmd)
-	
 
 	generateSystemdCmd.Flags().StringVarP(&installationPath, "installation-path", "p", "/usr/local/bin", "fwdctl installation path")
 	generateSystemdCmd.Flags().StringVarP(&c.RulesFile, "file", "f", "rules.yml", "rules file")
+	generateSystemdCmd.Flags().StringVarP(&serviceType, "type", "t", "oneshot", "systemd service type [oneshot, fork]")
 }
