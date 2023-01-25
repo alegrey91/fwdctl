@@ -2,6 +2,7 @@ package systemd_template
 
 import (
 	_ "embed"
+	"fmt"
 	"path/filepath"
 )
 
@@ -26,25 +27,23 @@ func serviceTypeAllowed(st string) bool {
 	return false
 }
 
-func NewSystemdService(serviceType, installationPath, rulesFile string) *SystemdService {
+func NewSystemdService(serviceType, installationPath, rulesFile string) (*SystemdService, error) {
 	if !serviceTypeAllowed(serviceType) {
-		// TODO: substitute with fmt.Errorf()
-		panic("service type provided not allowed")
+		return nil, fmt.Errorf("service type provided not allowed")
 	}
 	if !filepath.IsAbs(installationPath) {
 		// TODO: substitute with fmt.Errorf()
-		panic("installation path is not absolute")
+		return nil, fmt.Errorf("installation path is not absolute")
 	}
 	if !filepath.IsAbs(rulesFile) {
-		// TODO: substitute with fmt.Errorf()
-		panic("rules file is not absolute")
+		return nil, fmt.Errorf("rules file is not absolute")
 	}
 
 	return &SystemdService{
 		ServiceType:      serviceType,
 		InstallationPath: installationPath,
 		RulesFile:        rulesFile,
-	}
+	}, nil
 }
 
 func (s *SystemdService) GetTemplateStruct() interface{} {

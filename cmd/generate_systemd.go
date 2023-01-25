@@ -34,8 +34,11 @@ var generateSystemdCmd = &cobra.Command{
 	Long: `generates systemd service file to run fwdctl at boot
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		systemd := st.NewSystemdService(serviceType, installationPath, c.RulesFile)
-		err := template.GenerateTemplate(systemd, outputFile)
+		systemd, err := st.NewSystemdService(serviceType, installationPath, c.RulesFile)
+		if err != nil {
+			fmt.Println(err)
+		}
+		err = template.GenerateTemplate(systemd, outputFile)
 		if err != nil {
 			fmt.Println(err)
 		}
