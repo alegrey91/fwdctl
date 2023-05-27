@@ -16,7 +16,7 @@ func NewJson() *Json {
 	return &Json{}
 }
 
-func (j *Json) PrintResult(ruleList []string) error {
+func (j *Json) PrintResult(ruleList map[int]string) error {
 	rules := rules.NewRuleSet()
 	for _, rule := range ruleList {
 		jsonRule, err := extractRuleInfo(rule)
