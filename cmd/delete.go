@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,7 +41,7 @@ var deleteCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Delete rule number
-		if cmd.Flags().Lookup("by-id").Changed {
+		if cmd.Flags().Lookup("id").Changed {
 			err := ipt.DeleteForwardById(ruleId)
 			if err != nil {
 				fmt.Println(err)
@@ -49,7 +49,7 @@ var deleteCmd = &cobra.Command{
 		}
 
 		// Loop over file content and delete rule one-by-one.
-		if cmd.Flags().Lookup("by-file").Changed {
+		if cmd.Flags().Lookup("file").Changed {
 			file, _ := cmd.Flags().GetString("by-file")
 			rulesFile, err := rules.NewRuleSetFromFile(file)
 			if err != nil {

@@ -135,7 +135,6 @@ func ListForward(outputFormat string) (map[int]string, error) {
 	// check listed rules are tagged with custom tag
 	fwdRules := make(map[int]string)
 	for ruleId, rule := range ruleList {
-		fmt.Println(rule)
 		if strings.Contains(rule, label) {
 			fwdRules[ruleId] = rule
 		}
@@ -150,21 +149,10 @@ func DeleteForwardById(ruleId int) error {
 		return fmt.Errorf("failed: %v", err)
 	}
 
-	// retrieve rule using Id number
-	// (sudo iptables -t nat -L PREROUTING -n --line-numbers)
-	rule, err := ipt.ListById(fwdTable, fwdChain, ruleId)
-	if err != nil {
-		return fmt.Errorf("unable to retrieve rule with ID: %d", ruleId)
-	}
-
-	// cleaning rule (removing "-A PREROUTING", "-c 0 0", ...)
-	ruleSplit := strings.Split(rule, " ")
-	ruleSplit = append(ruleSplit[2:10], ruleSplit[13:]...)
-
 	// delete rule
-	err = ipt.Delete(fwdTable, fwdChain, ruleSplit...)
+	err = ipt.Delete(fwdTable, fwdChain, strconv.Itoa(ruleId))
 	if err != nil {
-		return fmt.Errorf("failed deleting rule #%d\n err: %v", ruleId, err)
+		return fmt.Errorf("failed deleting rule n. %d\nerr: %v", ruleId, err)
 	}
 	return nil
 }
