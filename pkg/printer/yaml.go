@@ -17,7 +17,7 @@ func NewYaml() *Yaml {
 	return &Yaml{}
 }
 
-func (y *Yaml) PrintResult(ruleList []string) error {
+func (y *Yaml) PrintResult(ruleList map[int]string) error {
 	rules := rules.NewRuleSet()
 	for _, rule := range ruleList {
 		jsonRule, err := extractRuleInfo(rule)

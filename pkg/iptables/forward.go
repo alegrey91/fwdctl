@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+var (
+	label string = "fwdctl"
+)
+
 func validateIface(iface string) error {
 	if iface == "" {
 		return fmt.Errorf("inteface name is empty")
@@ -81,6 +85,8 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 		"--dport", strconv.Itoa(dport),
 		"-j", fwdTarget,
 		"--to-destination", saddr + ":" + strconv.Itoa(sport),
+		"-m", "comment",
+		"--comment", label,
 	}
 
 	_, err = ValidateForward(iface, proto, dport, saddr, sport)
@@ -114,7 +120,7 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 	return nil
 }
 
-func ListForward(outputFormat string) ([]string, error) {
+func ListForward(outputFormat string) (map[int]string, error) {
 	ipt, err := getIPTablesInstance()
 	if err != nil {
 		return nil, fmt.Errorf("failed: %v", err)
@@ -126,7 +132,16 @@ func ListForward(outputFormat string) ([]string, error) {
 		return nil, fmt.Errorf("failed: %v", err)
 	}
 
-	return ruleList, nil
+	// check listed rules are tagged with custom tag
+	fwdRules := make(map[int]string)
+	for ruleId, rule := range ruleList {
+		fmt.Println(rule)
+		if strings.Contains(rule, label) {
+			fwdRules[ruleId] = rule
+		}
+	}
+
+	return fwdRules, nil
 }
 
 func DeleteForwardById(ruleId int) error {

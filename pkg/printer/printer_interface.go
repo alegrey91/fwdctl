@@ -6,7 +6,7 @@ import (
 )
 
 type Printer interface {
-	PrintResult(ruleList []string) error
+	PrintResult(ruleList map[int]string) error
 }
 
 func NewPrinter(printFormat string) Printer {
