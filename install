@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -e
+
+BINARY_NAME="fwdctl"
+KERNEL_NAME=$(uname -s)
+MACHINE_HW_NAME=$(uname -m)
+BINARY_RELEASE_NAME="${BINARY_NAME}_${KERNEL_NAME}_${MACHINE_HW_NAME}"
+CHECKSUMS="checksums.txt"
+
+cd /tmp
+
+# download binary + checksum file
+curl -s https://api.github.com/repos/alegrey91/fwdctl/releases/latest | \
+    grep "browser_download_url" | \
+    cut -d : -f 2,3 | \
+    tr -d \" | \
+    wget -q -i -
+
+# check if binary has been downloaded, otherwise exit
+if [ ! -f "$BINARY_RELEASE_NAME" ]; then
+    echo "$BINARY_RELEASE_NAME doesn't exists."
+    exit 1
+fi
+printf "[download succeded]\n"
+
+file_checksum=$(cat $CHECKSUMS | grep -w "$BINARY_RELEASE_NAME" | cut -d " " -f1)
+binary_checksum=$(sha256sum $BINARY_RELEASE_NAME | cut -d " " -f1)
+# check if checksum is consistent
+if [ "$file_checksum" != "$binary_checksum" ]; then
+    printf "Binary has been tampered!\n"
+    exit 1
+fi
+printf "[checksum succeded]\n"
+
+# install binary
+chmod +x "$BINARY_RELEASE_NAME"
+mv "$BINARY_RELEASE_NAME" "/usr/local/bin/$BINARY_NAME"
+printf "[installation succeded]\n"
+
+# clean up
+rm -rf "$BINARY_NAME"* "$CHECKSUMS"*
+printf "[clean up succeded]\n"
+

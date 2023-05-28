@@ -29,6 +29,6 @@ Full **documentation** [here](docs/getting-started.md).
 #### Linux x86_64
 
 ```shell
-wget https://github.com/alegrey91/fwdctl/releases/latest -O fwdctl && chmod +x fwdctl && sudo mv fwdctl /usr/local/bin/
+curl -s https://raw.githubusercontent.com/alegrey91/fwdctl/main/install | sudo sh
 ```
 
