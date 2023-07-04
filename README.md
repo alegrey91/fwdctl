@@ -2,6 +2,8 @@
 
 ![fwdctl](./fwdctl.png)
 
+![https://img.shields.io/ossf-scorecard/github.com/alegrey91/fwdctl?label=openssf%20scorecard&style=flat](https://img.shields.io/ossf-scorecard/github.com/alegrey91/fwdctl?label=openssf%20scorecard&style=flat)
+
 **fwdctl** is a simple and intuitive CLI to manage forwards in your **Linux** server.
 
 ## How it works
