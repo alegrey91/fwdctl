@@ -3,10 +3,21 @@ on:
   push:
     tags:
       - 'v*'
+permissions:
+  contents: read
+
 jobs:
   goreleaser:
+    permissions:
+      actions: write  # for anchore/sbom-action to upload workflow artifacts
+      contents: write  # for goreleaser/goreleaser-action to create a GitHub release
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@55d479fb1c5bcad5a4f9099a5d9f37c8857b2845 # v2.4.1
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # ratchet:actions/checkout@v3
         with:
@@ -27,7 +38,7 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: anchore/sbom-action@v0
+      - uses: anchore/sbom-action@78fc58e266e87a38d4194b2137a3d4e9bcaf7ca1 # v0.14.3
         with:
           artifact-name: fwdctl-sbom.spdx.json
       - name: Upload assets
