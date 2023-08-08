@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
         with:
           go-version: '1.20'
 
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
         with:
           go-version: '1.20'
 
@@ -79,7 +79,7 @@ jobs:
           ls -lah /tmp/integration-test
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
         with:
           go-version: '1.20'
 
