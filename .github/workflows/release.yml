@@ -29,7 +29,7 @@ jobs:
           check-latest: true
       - run: go version
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@b508e2e3ef3b19d4e4146d4f8fb3ba9db644a757 # ratchet:goreleaser/goreleaser-action@v3
+        uses: goreleaser/goreleaser-action@81d9ad71850a31bc2c99f6355208b6442d0a5783 # ratchet:goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
           version: latest
