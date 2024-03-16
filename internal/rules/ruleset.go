@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/alegrey91/fwdctl/pkg/iptables"
 	"gopkg.in/yaml.v2"
@@ -19,16 +19,16 @@ func NewRuleSet() *RuleSet {
 // NewRuleSet return the struct that contains informations about rules
 func NewRuleSetFromFile(path string) (*RuleSet, error) {
 	// Read rules from file
-	rulesFile, err := ioutil.ReadFile(path)
+	rulesFile, err := os.ReadFile(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error reading file: %v", err)
 	}
 
 	// Retrieve rules to fill RuleSet
 	rules := supportRuleSet{}
 	err = yaml.Unmarshal(rulesFile, &rules)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error unmarshaling content: %v", err)
 	}
 
 	// Fill RuleSet with rules taken from file

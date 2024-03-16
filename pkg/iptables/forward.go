@@ -83,7 +83,7 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 		"-p", proto,
 		"-m", proto,
 		"--dport", strconv.Itoa(dport),
-		"-j", fwdTarget,
+		"-j", FwdTarget,
 		"--to-destination", saddr + ":" + strconv.Itoa(sport),
 		"-m", "comment",
 		"--comment", label,
@@ -104,7 +104,7 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 	}
 
 	// check if provided rule already exists
-	ruleExists, err := ipt.Exists(fwdTable, fwdChain, ruleSpec...)
+	ruleExists, err := ipt.Exists(FwdTable, FwdChain, ruleSpec...)
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
@@ -113,7 +113,7 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 	}
 
 	// apply provided rule
-	err = ipt.AppendUnique(fwdTable, fwdChain, ruleSpec...)
+	err = ipt.AppendUnique(FwdTable, FwdChain, ruleSpec...)
 	if err != nil {
 		return fmt.Errorf("rule failed: %v", err)
 	}
@@ -127,7 +127,7 @@ func ListForward(outputFormat string) (map[int]string, error) {
 	}
 
 	//ruleList, err := ipt.ListWithCounters(fwdTable, fwdChain)
-	ruleList, err := ipt.List(fwdTable, fwdChain)
+	ruleList, err := ipt.List(FwdTable, FwdChain)
 	if err != nil {
 		return nil, fmt.Errorf("failed: %v", err)
 	}
@@ -150,7 +150,7 @@ func DeleteForwardById(ruleId int) error {
 	}
 
 	// delete rule
-	err = ipt.Delete(fwdTable, fwdChain, strconv.Itoa(ruleId))
+	err = ipt.Delete(FwdTable, FwdChain, strconv.Itoa(ruleId))
 	if err != nil {
 		return fmt.Errorf("failed deleting rule n. %d\nerr: %v", ruleId, err)
 	}
@@ -169,11 +169,12 @@ func DeleteForwardByRule(iface string, proto string, dport int, saddr string, sp
 		"-p", proto,
 		"-m", proto,
 		"--dport", strconv.Itoa(dport),
-		"-j", fwdTarget,
+		"-m", "comment", "--comment", "fwdctl",
+		"-j", FwdTarget,
 		"--to-destination", saddr + ":" + strconv.Itoa(sport),
 	}
 
-	err = ipt.Delete(fwdTable, fwdChain, ruleSpec...)
+	err = ipt.Delete(FwdTable, FwdChain, ruleSpec...)
 	if err != nil {
 		return fmt.Errorf("failed deleting rule: '%s'\n err: %v", ruleSpec, err)
 	}
