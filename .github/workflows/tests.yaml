@@ -9,6 +9,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Build coverage-instrumented binary
+        run: |
+          make build-cover && sudo make -B install
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -20,6 +24,7 @@ jobs:
           go test \
             -v \
             -cover ./... \
+            -skip TestFwdctl \
             -args -test.gocoverdir=/tmp/unit/
 
       - name: Upload cover profiles
@@ -41,14 +46,33 @@ jobs:
 
       - name: Build coverage-instrumented binary
         run: |
-          go build \
-            -cover \
-            -v \
-            -o fwdctl .
+          make build-cover && sudo make -B install
 
       - name: Run integration test
         run: |
-          sudo ./hack/integration-test.sh 
+          mkdir /tmp/integration
+          # we have to run integration tests one-by-one
+          # otherwhise they will run in parallel.
+          # since fwdctl apply network forwards, these could 
+          # interact with each other and make the test fail.
+          go test \
+            -exec sudo \
+            -cover \
+            -v ./... \
+            -run TestFwdctl/apply \
+            -args -test.gocoverdir=/tmp/integration/
+          go test \
+            -exec sudo \
+            -cover \
+            -v ./... \
+            -run TestFwdctl/create \
+            -args -test.gocoverdir=/tmp/integration/
+          go test \
+            -exec sudo \
+            -cover \
+            -v ./... \
+            -run TestFwdctl/delete \
+            -args -test.gocoverdir=/tmp/integration/
 
       - name: Upload cover profiles
         uses: actions/upload-artifact@v3
