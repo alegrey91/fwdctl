@@ -8,6 +8,14 @@ build: create-bin-dir
 		-o ${BINARY_DIR}/${BINARY_NAME} \
 		.
 
+build-cover: create-bin-dir
+	go mod download
+	go build \
+		-v \
+		-cover \
+		-o ${BINARY_DIR}/${BINARY_NAME} \
+		.
+
 build-gh: create-bin-dir
 ifndef GITHUB_REF_NAME
 	$(error GITHUB_REF_NAME is undefined)

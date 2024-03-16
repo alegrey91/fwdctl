@@ -11,5 +11,9 @@ func TestFwdctl(t *testing.T) {
 		Dir:                 "tests",
 		Cmds:                customCommands(),
 		RequireExplicitExec: true,
+		Setup: func(env *testscript.Env) error {
+			env.Setenv("GOCOVERDIR", "/tmp/integration")
+			return nil
+		},
 	})
 }
