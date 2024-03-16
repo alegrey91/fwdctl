@@ -1,0 +1,66 @@
+# this testscript test the 'apply' command
+
+# if go is not installed, then skip
+[!exec:go] skip
+
+exec fwdctl apply --help
+stdout 'Usage:'
+
+# test primarly subcommand 'apply'
+exec fwdctl apply --file rules-2.yaml
+fwd_exists lo tcp 3000 127.0.0.1 80
+fwd_exists lo tcp 3001 127.0.0.1 80
+fwd_exists lo udp 3002 127.0.0.1 80
+
+# clean up first test
+exec fwdctl delete -n 1
+exec fwdctl delete -n 1
+exec fwdctl delete -n 1
+
+exec fwdctl apply
+
+# clean up second test
+exec fwdctl delete -n 1
+exec fwdctl delete -n 1
+exec fwdctl delete -n 1
+
+# removing the default rules.yml file
+# it should fail
+exec rm rules.yml
+! exec fwdctl apply
+
+-- rules.yml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3002
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: udp
+
+-- rules-2.yaml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3002
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: udp
