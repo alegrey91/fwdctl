@@ -1,0 +1,48 @@
+# this testscript test the 'delete' command
+
+# if go is not installed, then skip
+[!exec:go] skip
+
+exec fwdctl delete --help
+stdout 'Usage:'
+
+# delete e simple rule by passing id
+exec fwdctl create -d 3000 -s 127.0.0.1 -p 80 -i lo
+fwd_exists lo tcp 3000 127.0.0.1 80
+exec fwdctl delete -n 1
+
+# delete list of rules by using a rules.yaml file
+exec fwdctl create -d 3000 -s 127.0.0.1 -p 80 -i lo
+fwd_exists lo tcp 3000 127.0.0.1 80
+exec fwdctl create -d 3001 -s 127.0.0.1 -p 80 -i lo
+fwd_exists lo tcp 3001 127.0.0.1 80
+exec fwdctl create -d 3002 -s 127.0.0.1 -p 80 -i lo
+fwd_exists lo tcp 3002 127.0.0.1 80
+exec fwdctl delete --file rules.yaml
+
+# delete multiple ids
+exec fwdctl apply -f rules.yaml
+fwd_exists lo tcp 3000 127.0.0.1 80
+fwd_exists lo tcp 3001 127.0.0.1 80
+fwd_exists lo tcp 3002 127.0.0.1 80
+exec fwdctl delete -n 3
+exec fwdctl delete -n 2
+exec fwdctl delete -n 1
+
+-- rules.yaml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3002
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
