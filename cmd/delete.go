@@ -17,6 +17,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	//"os"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
@@ -45,20 +47,22 @@ var deleteCmd = &cobra.Command{
 			err := ipt.DeleteForwardById(ruleId)
 			if err != nil {
 				fmt.Println(err)
+				os.Exit(1)
 			}
 		}
 
 		// Loop over file content and delete rule one-by-one.
 		if cmd.Flags().Lookup("file").Changed {
-			file, _ := cmd.Flags().GetString("by-file")
 			rulesFile, err := rules.NewRuleSetFromFile(file)
 			if err != nil {
 				fmt.Println(err)
+				os.Exit(1)
 			}
 			for _, rule := range rulesFile.Rules {
 				err := ipt.DeleteForwardByRule(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
 				if err != nil {
 					fmt.Println(err)
+					os.Exit(1)
 				}
 			}
 		}

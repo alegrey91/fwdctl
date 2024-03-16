@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/internal/rules"
@@ -29,11 +30,12 @@ var applyCmd = &cobra.Command{
 	Use:     "apply",
 	Short:   "apply rules from file",
 	Long:    `apply rules described in a configuration file`,
-	Example: c.ProgramName + " apply --rule-file rule.yml",
+	Example: c.ProgramName + " apply --file rule.yml",
 	Run: func(cmd *cobra.Command, args []string) {
 		ruleSet, err := rules.NewRuleSetFromFile(c.RulesFile)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Printf("unable to open rules file: %v\n", err)
+			os.Exit(1)
 		}
 
 		for ruleId, rule := range ruleSet.Rules {

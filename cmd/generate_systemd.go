@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/pkg/template"
@@ -25,7 +26,7 @@ import (
 )
 
 var installationPath string
-var serviceType      string
+var serviceType string
 
 // generateSystemdCmd represents the generateSystemd command
 var generateSystemdCmd = &cobra.Command{
@@ -37,10 +38,12 @@ var generateSystemdCmd = &cobra.Command{
 		systemd, err := st.NewSystemdService(serviceType, installationPath, c.RulesFile)
 		if err != nil {
 			fmt.Println(err)
+			os.Exit(1)
 		}
 		err = template.GenerateTemplate(systemd, outputFile)
 		if err != nil {
 			fmt.Println(err)
+			os.Exit(1)
 		}
 	},
 }
