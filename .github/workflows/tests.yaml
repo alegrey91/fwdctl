@@ -73,6 +73,12 @@ jobs:
             -v ./... \
             -run TestFwdctl/delete \
             -args -test.gocoverdir=/tmp/integration/
+          go test \
+            -exec sudo \
+            -cover \
+            -v ./... \
+            -run TestFwdctl/list \
+            -args -test.gocoverdir=/tmp/integration/
 
       - name: Upload cover profiles
         uses: actions/upload-artifact@v3

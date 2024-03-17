@@ -1,0 +1,51 @@
+# this testscript test the 'create' command
+
+# if go is not installed, then skip
+[!exec:go] skip
+
+exec fwdctl list --help
+stdout 'Usage:'
+
+# test primarly subcommand 'create'
+exec fwdctl create -d 3000 -s 127.0.0.1 -p 80 -i lo
+fwd_exists lo tcp 3000 127.0.0.1 80
+
+# compare table view
+exec fwdctl list
+cmp stdout list-table.txt
+
+# compare json view
+exec fwdctl list -o json
+cmp stdout list-json.txt
+
+# compare yaml view
+exec fwdctl list -o yaml
+cmp stdout list-yaml.txt
+
+# check alias works
+exec fwdctl ls
+
+-- list-table.txt --
++--------+-----------+----------+---------------+-------------+---------------+
+| NUMBER | INTERFACE | PROTOCOL | EXTERNAL PORT | INTERNAL IP | INTERNAL PORT |
++--------+-----------+----------+---------------+-------------+---------------+
+|      1 | lo        | tcp      |          3000 | 127.0.0.1   |            80 |
++--------+-----------+----------+---------------+-------------+---------------+
+-- list-json.txt --
+{
+    "0be1c5f4141015ca6a8e873344da06e6": {
+        "Iface": "lo",
+        "Proto": "tcp",
+        "Dport": 3000,
+        "Saddr": "127.0.0.1",
+        "Sport": 80
+    }
+}
+-- list-yaml.txt --
+0be1c5f4141015ca6a8e873344da06e6:
+    iface: lo
+    proto: tcp
+    dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+
