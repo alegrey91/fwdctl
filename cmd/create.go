@@ -64,7 +64,7 @@ your hypervisor, to external.
 func init() {
 	rootCmd.AddCommand(createCmd)
 
-	createCmd.Flags().StringVarP(&iface, "interface", "i", "eth0", "interface name")
+	createCmd.Flags().StringVarP(&iface, "interface", "i", "lo", "interface name")
 	createCmd.Flags().StringVarP(&proto, "proto", "P", "tcp", "protocol")
 
 	createCmd.Flags().IntVarP(&dport, "destination-port", "d", 0, "destination port")
