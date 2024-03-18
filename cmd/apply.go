@@ -38,10 +38,24 @@ var applyCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		rulesFileIsValid := true
 		for ruleId, rule := range ruleSet.Rules {
-			err = ipt.CreateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+			valid, err := ipt.ValidateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
 			if err != nil {
-				fmt.Printf("rule#%s - %v\n", ruleId, err)
+				fmt.Printf("error validating rule (%s): %v\n", ruleId, err)
+				os.Exit(1)
+			}
+			if !valid {
+				rulesFileIsValid = valid
+			}
+		}
+		if rulesFileIsValid {
+			for ruleId, rule := range ruleSet.Rules {
+				err = ipt.CreateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+				if err != nil {
+					fmt.Printf("error applying rule (%s): %v\n", ruleId, err)
+					os.Exit(1)
+				}
 			}
 		}
 	},

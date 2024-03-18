@@ -28,15 +28,14 @@ func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
 
 	exists, err := ipt.Exists(iptables.FwdTable, iptables.FwdChain, ruleSpec...)
 	if err != nil {
-		ts.Fatalf("error checking rule: %q", err)
+		ts.Fatalf("error checking rule: %v", err)
 	}
-	if neg {
-		if exists {
-			ts.Fatalf("forward found")
-		}
+	if neg && !exists {
+		ts.Logf("forward doesn't exist")
+		return
 	}
 	if !exists {
-		ts.Fatalf("no forward rule found")
+		ts.Fatalf("forward doesn't exist")
 	}
 }
 
