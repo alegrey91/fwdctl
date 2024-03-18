@@ -11,17 +11,17 @@ exec fwdctl create -d 3000 -s 127.0.0.1 -p 80 -i lo
 fwd_exists lo tcp 3000 127.0.0.1 80
 exec fwdctl delete -n 1
 
-# delete list of rules by using a rules.yaml file
+# delete list of rules by using a rules.yml file
 exec fwdctl create -d 3000 -s 127.0.0.1 -p 80 -i lo
 fwd_exists lo tcp 3000 127.0.0.1 80
 exec fwdctl create -d 3001 -s 127.0.0.1 -p 80 -i lo
 fwd_exists lo tcp 3001 127.0.0.1 80
 exec fwdctl create -d 3002 -s 127.0.0.1 -p 80 -i lo
 fwd_exists lo tcp 3002 127.0.0.1 80
-exec fwdctl delete --file rules.yaml
+exec fwdctl delete --file rules.yml
 
 # delete multiple ids
-exec fwdctl apply -f rules.yaml
+exec fwdctl apply -f rules.yml
 fwd_exists lo tcp 3000 127.0.0.1 80
 fwd_exists lo tcp 3001 127.0.0.1 80
 fwd_exists lo tcp 3002 127.0.0.1 80
@@ -30,7 +30,7 @@ exec fwdctl delete -n 2
 exec fwdctl delete -n 1
 
 # create forwards and then delete them with '--all#
-exec fwdctl apply -f rules.yaml
+exec fwdctl apply -f rules.yml
 fwd_exists lo tcp 3000 127.0.0.1 80
 fwd_exists lo tcp 3001 127.0.0.1 80
 fwd_exists lo tcp 3002 127.0.0.1 80
@@ -39,9 +39,19 @@ exec fwdctl delete --all
 ! fwd_exists lo tcp 3001 127.0.0.1 80
 ! fwd_exists lo tcp 3002 127.0.0.1 80
 
-! exec fwdctl delete -n 1 -a -f rules.yaml
+# unable to use all the flags at the same time
+! exec fwdctl delete -n 1 -a -f rules.yml
 
--- rules.yaml --
+exec fwdctl apply
+fwd_exists lo tcp 3000 127.0.0.1 80
+fwd_exists lo tcp 3001 127.0.0.1 80
+fwd_exists lo tcp 3002 127.0.0.1 80
+exec fwdctl delete
+! fwd_exists lo tcp 3000 127.0.0.1 80
+! fwd_exists lo tcp 3001 127.0.0.1 80
+! fwd_exists lo tcp 3002 127.0.0.1 80
+
+-- rules.yml --
 rules:
   - dport: 3000
     saddr: 127.0.0.1

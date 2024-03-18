@@ -54,18 +54,7 @@ var deleteCmd = &cobra.Command{
 
 		// Loop over file content and delete rule one-by-one.
 		if cmd.Flags().Lookup("file").Changed {
-			rulesFile, err := rules.NewRuleSetFromFile(file)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-			for _, rule := range rulesFile.Rules {
-				err := ipt.DeleteForwardByRule(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
-			}
+			deleteFromFile(file)
 			return
 		}
 
@@ -77,6 +66,8 @@ var deleteCmd = &cobra.Command{
 			}
 			return
 		}
+
+		deleteFromFile(file)
 	},
 }
 
@@ -84,7 +75,22 @@ func init() {
 	rootCmd.AddCommand(deleteCmd)
 
 	deleteCmd.Flags().IntVarP(&ruleId, "id", "n", 0, "delete rule through number")
-	deleteCmd.Flags().StringVarP(&file, "file", "f", "", "delete rule through rules file")
+	deleteCmd.Flags().StringVarP(&file, "file", "f", "rules.yml", "delete rule through rules file")
 	deleteCmd.Flags().BoolP("all", "a", false, "delete rule through rules file")
 	deleteCmd.MarkFlagsMutuallyExclusive("id", "file")
+}
+
+func deleteFromFile(file string) {
+	rulesFile, err := rules.NewRuleSetFromFile(file)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	for _, rule := range rulesFile.Rules {
+		err := ipt.DeleteForwardByRule(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}
 }
