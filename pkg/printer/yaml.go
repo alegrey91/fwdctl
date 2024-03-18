@@ -6,6 +6,7 @@ import (
 
 	yaml "gopkg.in/yaml.v3"
 
+	"github.com/alegrey91/fwdctl/internal/extractor"
 	"github.com/alegrey91/fwdctl/internal/rules"
 	"github.com/alegrey91/fwdctl/pkg/iptables"
 )
@@ -20,7 +21,7 @@ func NewYaml() *Yaml {
 func (y *Yaml) PrintResult(ruleList map[int]string) error {
 	rules := rules.NewRuleSet()
 	for _, rule := range ruleList {
-		jsonRule, err := extractRuleInfo(rule)
+		jsonRule, err := extractor.ExtractRuleInfo(rule)
 		if err != nil {
 			continue
 		}
