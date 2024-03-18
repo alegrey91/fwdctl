@@ -21,16 +21,21 @@ fwd_exists lo udp 3002 127.0.0.1 80
 exec fwdctl list -o json
 cmp stdout fwdctl_list.json
 
+# clean up environment
+exec fwdctl delete -n 1
+exec fwdctl delete -n 1
+exec fwdctl delete -n 1
+
+# create rule without specifying interface
+exec fwdctl create -d 3003 -s 127.0.0.1 -p 80
+fwd_exists lo tcp 3003 127.0.0.1 80
+exec fwdctl delete -n 1
+
 # should not create rules
 ! exec fwdctl create -d 3003 -s 127.0.0.1
 ! exec fwdctl create -d 3003 -p 80
 ! exec fwdctl create -s 127.0.0.1 -p 80
 ! exec fwdctl create -i lo -P tcp
-
-# clean up all the created rules
-exec fwdctl delete -n 1
-exec fwdctl delete -n 1
-exec fwdctl delete -n 1
 
 -- fwdctl_list.json --
 {
