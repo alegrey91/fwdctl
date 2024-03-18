@@ -4,6 +4,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/alegrey91/fwdctl/internal/extractor"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -18,7 +19,7 @@ func (t *Table) PrintResult(ruleList map[int]string) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"number", "interface", "protocol", "external port", "internal ip", "internal port"})
 	for ruleId, rule := range ruleList {
-		tabRule, err := extractRuleInfo(rule)
+		tabRule, err := extractor.ExtractRuleInfo(rule)
 		if err != nil {
 			continue
 		}

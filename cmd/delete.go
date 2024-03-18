@@ -49,6 +49,7 @@ var deleteCmd = &cobra.Command{
 				fmt.Println(err)
 				os.Exit(1)
 			}
+			return
 		}
 
 		// Loop over file content and delete rule one-by-one.
@@ -65,6 +66,16 @@ var deleteCmd = &cobra.Command{
 					os.Exit(1)
 				}
 			}
+			return
+		}
+
+		if cmd.Flags().Lookup("all").Changed {
+			err := ipt.DeleteAllForwards()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			return
 		}
 	},
 }
@@ -74,5 +85,6 @@ func init() {
 
 	deleteCmd.Flags().IntVarP(&ruleId, "id", "n", 0, "delete rule through number")
 	deleteCmd.Flags().StringVarP(&file, "file", "f", "", "delete rule through rules file")
+	deleteCmd.Flags().BoolP("all", "a", false, "delete rule through rules file")
 	deleteCmd.MarkFlagsMutuallyExclusive("id", "file")
 }

@@ -29,6 +29,18 @@ exec fwdctl delete -n 3
 exec fwdctl delete -n 2
 exec fwdctl delete -n 1
 
+# create forwards and then delete them with '--all#
+exec fwdctl apply -f rules.yaml
+fwd_exists lo tcp 3000 127.0.0.1 80
+fwd_exists lo tcp 3001 127.0.0.1 80
+fwd_exists lo tcp 3002 127.0.0.1 80
+exec fwdctl delete --all
+! fwd_exists lo tcp 3000 127.0.0.1 80
+! fwd_exists lo tcp 3001 127.0.0.1 80
+! fwd_exists lo tcp 3002 127.0.0.1 80
+
+! exec fwdctl delete -n 1 -a -f rules.yaml
+
 -- rules.yaml --
 rules:
   - dport: 3000

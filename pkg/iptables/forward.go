@@ -5,6 +5,8 @@ import (
 	"net"
 	"strconv"
 	"strings"
+
+	"github.com/alegrey91/fwdctl/internal/extractor"
 )
 
 var (
@@ -143,10 +145,9 @@ func ListForward(outputFormat string) (map[int]string, error) {
 		return nil, fmt.Errorf("failed: %v", err)
 	}
 
-	//ruleList, err := ipt.ListWithCounters(fwdTable, fwdChain)
 	ruleList, err := ipt.List(FwdTable, FwdChain)
 	if err != nil {
-		return nil, fmt.Errorf("failed: %v", err)
+		return nil, fmt.Errorf("failed listing rules: %v", err)
 	}
 
 	// check listed rules are tagged with custom tag
@@ -194,6 +195,47 @@ func DeleteForwardByRule(iface string, proto string, dport int, saddr string, sp
 	err = ipt.Delete(FwdTable, FwdChain, ruleSpec...)
 	if err != nil {
 		return fmt.Errorf("failed deleting rule: '%s'\n err: %v", ruleSpec, err)
+	}
+	return nil
+}
+
+func DeleteAllForwards() error {
+	ipt, err := getIPTablesInstance()
+	if err != nil {
+		return fmt.Errorf("failed: %v", err)
+	}
+
+	ruleList, err := ipt.List(FwdTable, FwdChain)
+	if err != nil {
+		return fmt.Errorf("failed listing rules: %v", err)
+	}
+
+	// check listed rules are tagged with custom tag
+	fwdRules := make(map[int]string)
+	for ruleId, rule := range ruleList {
+		if strings.Contains(rule, label) {
+			fwdRules[ruleId] = rule
+		}
+	}
+
+	for _, rule := range fwdRules {
+		r, err := extractor.ExtractRuleInfo(rule)
+		if err != nil {
+			return fmt.Errorf("error extracting rule info: %v", err)
+		}
+		ruleSpec := []string{
+			"-i", r[1],
+			"-p", r[2],
+			"-m", r[2],
+			"--dport", r[3],
+			"-m", "comment", "--comment", "fwdctl",
+			"-j", FwdTarget,
+			"--to-destination", r[4] + ":" + r[5],
+		}
+		err = ipt.Delete(FwdTable, FwdChain, ruleSpec...)
+		if err != nil {
+			return fmt.Errorf("error deleting rule: %v", err)
+		}
 	}
 	return nil
 }
