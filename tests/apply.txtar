@@ -16,6 +16,7 @@ fwd_exists lo udp 3002 127.0.0.1 80
 exec fwdctl delete -n 1
 exec fwdctl delete -n 1
 exec fwdctl delete -n 1
+exec fwdctl delete -n 1
 
 exec fwdctl apply
 
@@ -28,6 +29,48 @@ exec fwdctl delete -n 1
 # it should fail
 exec rm rules.yml
 ! exec fwdctl apply
+
+# should not apply
+# (wrong protocol)
+! exec fwdctl apply --file rules-wrong.yaml
+! fwd_exists lo tcp 3000 127.0.0.1 80
+! fwd_exists lo tcp 3001 127.0.0.1 80
+! fwd_exists lo tcp 3002 127.0.0.1 80
+
+# should not apply
+# (empty interface)
+! exec fwdctl apply --file rules-wrong2.yaml
+! fwd_exists lo tcp 3000 127.0.0.1 80
+! fwd_exists lo tcp 3001 127.0.0.1 80
+! fwd_exists lo tcp 3002 127.0.0.1 80
+
+# should not apply
+# (interface doesn't exist)
+! exec fwdctl apply --file rules-wrong3.yaml
+! fwd_exists lo tcp 3000 127.0.0.1 80
+! fwd_exists lo tcp 3001 127.0.0.1 80
+! fwd_exists lo tcp 3002 127.0.0.1 80
+
+# should not apply
+# (empty destination port)
+! exec fwdctl apply --file rules-wrong4.yaml
+! fwd_exists lo tcp 3000 127.0.0.1 80
+! fwd_exists lo tcp 3001 127.0.0.1 80
+! fwd_exists lo tcp 3002 127.0.0.1 80
+
+# should not apply
+# (empty source address)
+! exec fwdctl apply --file rules-wrong5.yaml
+! fwd_exists lo tcp 3000 127.0.0.1 80
+! fwd_exists lo tcp 3001 127.0.0.1 80
+! fwd_exists lo tcp 3002 127.0.0.1 80
+
+# should not apply
+# (empty source port)
+! exec fwdctl apply --file rules-wrong6.yaml
+! fwd_exists lo tcp 3000 127.0.0.1 80
+! fwd_exists lo tcp 3001 127.0.0.1 80
+! fwd_exists lo tcp 3002 127.0.0.1 80
 
 -- rules.yml --
 rules:
@@ -64,3 +107,111 @@ rules:
     sport: 80
     iface: lo
     proto: udp
+
+-- rules-wrong.yaml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3002
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: xxx
+
+-- rules-wrong2.yaml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3002
+    saddr: 127.0.0.1
+    sport: 80
+    iface: 
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+
+-- rules-wrong3.yaml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3002
+    saddr: 127.0.0.1
+    sport: 80
+    iface: aaa
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+
+-- rules-wrong4.yaml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+
+-- rules-wrong5.yaml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+
+-- rules-wrong6.yaml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp

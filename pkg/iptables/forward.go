@@ -2,6 +2,7 @@ package iptables
 
 import (
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 )
@@ -12,7 +13,20 @@ var (
 
 func validateIface(iface string) error {
 	if iface == "" {
-		return fmt.Errorf("inteface name is empty")
+		return fmt.Errorf("name is empty")
+	}
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return fmt.Errorf("error: %v", err)
+	}
+	found := false
+	for _, i := range ifaces {
+		if i.Name == iface {
+			found = true
+		}
+	}
+	if !found {
+		return fmt.Errorf("not found")
 	}
 	return nil
 }
@@ -36,6 +50,9 @@ func validatePort(port int) error {
 
 func validateAddress(address string) error {
 	// not a valid check for now.
+	if address == "" {
+		return fmt.Errorf("address is empty")
+	}
 	return nil
 }
 
