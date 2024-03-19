@@ -42,7 +42,7 @@ var generateSystemdCmd = &cobra.Command{
 		}
 		err = template.GenerateTemplate(systemd, outputFile)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Printf("error generating templated file: %v\n", err)
 			os.Exit(1)
 		}
 	},
@@ -52,6 +52,6 @@ func init() {
 	generateCmd.AddCommand(generateSystemdCmd)
 
 	generateSystemdCmd.Flags().StringVarP(&installationPath, "installation-path", "p", "/usr/local/bin", "fwdctl installation path")
-	generateSystemdCmd.Flags().StringVarP(&c.RulesFile, "file", "f", "rules.yml", "rules file")
+	generateSystemdCmd.Flags().StringVarP(&c.RulesFile, "file", "f", "rules.yml", "rules file path")
 	generateSystemdCmd.Flags().StringVarP(&serviceType, "type", "t", "oneshot", "systemd service type [oneshot, fork]")
 }
