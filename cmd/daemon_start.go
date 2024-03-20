@@ -29,7 +29,7 @@ var daemonStartCmd = &cobra.Command{
 	Short: "Start fwdctl daemon",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		rulesFile, err := cmd.Flags().GetString("rules-file")
+		rulesFile, err := cmd.Flags().GetString("file")
 		if err != nil {
 			fmt.Println(err)
 			return
