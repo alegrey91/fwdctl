@@ -74,10 +74,10 @@ var deleteCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(deleteCmd)
 
-	deleteCmd.Flags().IntVarP(&ruleId, "id", "n", 0, "delete rule through number")
-	deleteCmd.Flags().StringVarP(&file, "file", "f", "rules.yml", "delete rule through rules file")
-	deleteCmd.Flags().BoolP("all", "a", false, "delete rule through rules file")
-	deleteCmd.MarkFlagsMutuallyExclusive("id", "file")
+	deleteCmd.Flags().IntVarP(&ruleId, "id", "n", 0, "delete rules through ID")
+	deleteCmd.Flags().StringVarP(&file, "file", "f", "rules.yml", "delete rules through file")
+	deleteCmd.Flags().BoolP("all", "a", false, "delete all rules")
+	deleteCmd.MarkFlagsMutuallyExclusive("id", "file", "all")
 }
 
 func deleteFromFile(file string) {
