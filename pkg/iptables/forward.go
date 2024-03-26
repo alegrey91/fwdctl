@@ -5,6 +5,7 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/alegrey91/fwdctl/internal/extractor"
 )
@@ -58,35 +59,41 @@ func validateAddress(address string) error {
 	return nil
 }
 
-// ValidateForward returns both bool and error.
+func Validate(iface string, proto string, dport int, saddr string, sport int, wg *sync.WaitGroup, errCh chan error) {
+	defer wg.Done()
+	err := validateForward(iface, proto, dport, saddr, sport)
+	errCh <- err
+}
+
+// validateForward returns both bool and error.
 // The boolean return true in case the rule passes all checks.
 // In case it does not, then the error will describe the problem.
-func ValidateForward(iface string, proto string, dport int, saddr string, sport int) (bool, error) {
+func validateForward(iface string, proto string, dport int, saddr string, sport int) error {
 	err := validateIface(iface)
 	if err != nil {
-		return false, fmt.Errorf("interface: '%s' %v", iface, err)
+		return fmt.Errorf("interface: '%s' %v", iface, err)
 	}
 
 	err = validateProto(proto)
 	if err != nil {
-		return false, fmt.Errorf("protocol: '%s' %v", proto, err)
+		return fmt.Errorf("protocol: '%s' %v", proto, err)
 	}
 
 	err = validatePort(dport)
 	if err != nil {
-		return false, fmt.Errorf("destination port: '%d' %v", dport, err)
+		return fmt.Errorf("destination port: '%d' %v", dport, err)
 	}
 
 	err = validateAddress(saddr)
 	if err != nil {
-		return false, fmt.Errorf("source address: '%s' %v", saddr, err)
+		return fmt.Errorf("source address: '%s' %v", saddr, err)
 	}
 
 	err = validatePort(sport)
 	if err != nil {
-		return false, fmt.Errorf("source port: '%d' %v", sport, err)
+		return fmt.Errorf("source port: '%d' %v", sport, err)
 	}
-	return true, nil
+	return nil
 }
 
 func CreateForward(iface string, proto string, dport int, saddr string, sport int) error {
@@ -106,11 +113,6 @@ func CreateForward(iface string, proto string, dport int, saddr string, sport in
 		"--to-destination", saddr + ":" + strconv.Itoa(sport),
 		"-m", "comment",
 		"--comment", label,
-	}
-
-	_, err = ValidateForward(iface, proto, dport, saddr, sport)
-	if err != nil {
-		return fmt.Errorf("validation error: %v", err)
 	}
 
 	// check if input interface exists on the system
