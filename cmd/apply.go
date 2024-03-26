@@ -18,6 +18,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"sync"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/internal/rules"
@@ -38,17 +39,26 @@ var applyCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		var wg sync.WaitGroup
+		chErr := make(chan error, len(ruleSet.Rules))
 		rulesFileIsValid := true
-		for ruleId, rule := range ruleSet.Rules {
-			valid, err := ipt.ValidateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+
+		for _, rule := range ruleSet.Rules {
+			wg.Add(1)
+			go ipt.Validate(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport, &wg, chErr)
+		}
+		go func() {
+			wg.Wait()
+			close(chErr)
+		}()
+
+		for err := range chErr {
 			if err != nil {
-				fmt.Printf("error validating rule (%s): %v\n", ruleId, err)
+				fmt.Printf("error validating rule: %v\n", err)
 				os.Exit(1)
 			}
-			if !valid {
-				rulesFileIsValid = valid
-			}
 		}
+
 		if rulesFileIsValid {
 			for ruleId, rule := range ruleSet.Rules {
 				err = ipt.CreateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
