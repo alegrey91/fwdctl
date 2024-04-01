@@ -23,7 +23,7 @@ import (
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/internal/rules"
-	ipt "github.com/alegrey91/fwdctl/pkg/iptables"
+	iptables "github.com/alegrey91/fwdctl/pkg/iptables"
 	"github.com/spf13/cobra"
 )
 
@@ -41,7 +41,11 @@ var deleteCmd = &cobra.Command{
 `,
 	Example: c.ProgramName + " delete -n 2",
 	Run: func(cmd *cobra.Command, args []string) {
-
+		ipt, err := iptables.NewIPTablesInstance()
+		if err != nil {
+			fmt.Printf("unable to get iptables instance: %v\n", err)
+			os.Exit(1)
+		}
 		// Delete rule number
 		if cmd.Flags().Lookup("id").Changed {
 			err := ipt.DeleteForwardById(ruleId)
@@ -54,7 +58,7 @@ var deleteCmd = &cobra.Command{
 
 		// Loop over file content and delete rule one-by-one.
 		if cmd.Flags().Lookup("file").Changed {
-			deleteFromFile(file)
+			deleteFromFile(ipt, file)
 			return
 		}
 
@@ -67,7 +71,7 @@ var deleteCmd = &cobra.Command{
 			return
 		}
 
-		deleteFromFile(file)
+		deleteFromFile(ipt, file)
 	},
 }
 
@@ -80,7 +84,7 @@ func init() {
 	deleteCmd.MarkFlagsMutuallyExclusive("id", "file", "all")
 }
 
-func deleteFromFile(file string) {
+func deleteFromFile(ipt *iptables.IPTablesInstance, file string) {
 	rulesFile, err := rules.NewRuleSetFromFile(file)
 	if err != nil {
 		fmt.Println(err)
