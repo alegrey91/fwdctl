@@ -5,7 +5,6 @@ import (
 	"net"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/alegrey91/fwdctl/internal/extractor"
 )
@@ -59,10 +58,8 @@ func validateAddress(address string) error {
 	return nil
 }
 
-func Validate(iface string, proto string, dport int, saddr string, sport int, wg *sync.WaitGroup, errCh chan error) {
-	defer wg.Done()
-	err := validateForward(iface, proto, dport, saddr, sport)
-	errCh <- err
+func Validate(iface string, proto string, dport int, saddr string, sport int) error {
+	return validateForward(iface, proto, dport, saddr, sport)
 }
 
 // validateForward returns both bool and error.
