@@ -1,6 +1,7 @@
 package daemon
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -47,7 +48,13 @@ func Start(rulesFile string) {
 	// Anyway, for now, it works.
 	infoLogger.Println(banner())
 
-	err := createPidFile()
+	ipt, err := iptables.NewIPTablesInstance()
+	if err != nil {
+		fmt.Printf("unable to get iptables instance: %v\n", err)
+		os.Exit(1)
+	}
+
+	err = createPidFile()
 	if err != nil {
 		errorLogger.Println(err)
 		os.Exit(1)
@@ -65,7 +72,7 @@ func Start(rulesFile string) {
 	}
 	// apply all the rules present in rulesFile
 	for ruleId, rule := range ruleSet.Rules {
-		err = iptables.CreateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+		err = ipt.CreateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
 		if err != nil {
 			infoLogger.Printf("rule %s - %v\n", ruleId, err)
 		}
@@ -102,7 +109,7 @@ func Start(rulesFile string) {
 			case <-sigChnl:
 				// flush rules before exit
 				for _, rule := range ruleSet.Rules {
-					err := iptables.DeleteForwardByRule(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+					err := ipt.DeleteForwardByRule(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
 					if err != nil {
 						errorLogger.Println(err)
 					}

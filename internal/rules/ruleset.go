@@ -70,12 +70,17 @@ func (rs *RuleSet) Remove(ruleHash string) {
 // between the old and current rules set.
 // Return an error in case of fail, nil otherwise.
 func (rs *RuleSet) Diff(oldRS *RuleSet) error {
+	ipt, err := iptables.NewIPTablesInstance()
+	if err != nil {
+		fmt.Printf("unable to get iptables instance: %v\n", err)
+		os.Exit(1)
+	}
 	// loop over old rules set, to find rules to be removed
 	for hash := range oldRS.Rules {
 		// if key in oldRules is not present in rs,
 		// then the old rule must be removed
 		if _, ok := rs.Rules[hash]; !ok {
-			err := iptables.DeleteForwardByRule(
+			err := ipt.DeleteForwardByRule(
 				oldRS.Rules[hash].Iface,
 				oldRS.Rules[hash].Proto,
 				oldRS.Rules[hash].Dport,
@@ -92,7 +97,7 @@ func (rs *RuleSet) Diff(oldRS *RuleSet) error {
 		// if key in rs in not present in oldRs,
 		// then the new rule must be added
 		if _, ok := oldRS.Rules[hash]; !ok {
-			err := iptables.CreateForward(
+			err := ipt.CreateForward(
 				rs.Rules[hash].Iface,
 				rs.Rules[hash].Proto,
 				rs.Rules[hash].Dport,

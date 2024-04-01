@@ -22,7 +22,7 @@ import (
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/internal/rules"
-	ipt "github.com/alegrey91/fwdctl/pkg/iptables"
+	iptables "github.com/alegrey91/fwdctl/pkg/iptables"
 	"github.com/spf13/cobra"
 )
 
@@ -38,6 +38,11 @@ var applyCmd = &cobra.Command{
 			fmt.Printf("unable to open rules file: %v\n", err)
 			os.Exit(1)
 		}
+		ipt, err := iptables.NewIPTablesInstance()
+		if err != nil {
+			fmt.Printf("unable to get iptables instance: %v\n", err)
+			os.Exit(1)
+		}
 
 		var wg sync.WaitGroup
 		chErr := make(chan error, len(ruleSet.Rules))
@@ -48,8 +53,8 @@ var applyCmd = &cobra.Command{
 			wg.Add(1)
 			// add slot to buffered channel
 			chLimit <- 1
-			go func(rule ipt.Rule, wg *sync.WaitGroup, chErr chan error, chLimit chan int) {
-				err := ipt.Validate(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+			go func(rule iptables.Rule, wg *sync.WaitGroup, chErr chan error, chLimit chan int) {
+				err := ipt.ValidateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
 				wg.Done()
 				chErr <- err
 				// free slot from buffered channel

@@ -17,9 +17,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
-	ipt "github.com/alegrey91/fwdctl/pkg/iptables"
+	iptables "github.com/alegrey91/fwdctl/pkg/iptables"
 	"github.com/spf13/cobra"
 )
 
@@ -53,7 +54,12 @@ your hypervisor, to external.
 `,
 	Example: c.ProgramName + " create -d 3000 -s 192.168.199.105 -p 80",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := ipt.CreateForward(iface, proto, dport, saddr, sport)
+		ipt, err := iptables.NewIPTablesInstance()
+		if err != nil {
+			fmt.Printf("unable to get iptables instance: %v\n", err)
+			os.Exit(1)
+		}
+		err = ipt.CreateForward(iface, proto, dport, saddr, sport)
 		if err != nil {
 			fmt.Println(err)
 			return

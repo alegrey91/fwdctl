@@ -59,7 +59,7 @@ func Test_validateForward(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateForward(tt.iface, tt.proto, tt.dport, tt.saddr, tt.sport); (err != nil) != tt.wantErr {
+			if err := validate(tt.iface, tt.proto, tt.dport, tt.saddr, tt.sport); (err != nil) != tt.wantErr {
 				t.Errorf("validateForward() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
