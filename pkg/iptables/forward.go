@@ -104,7 +104,7 @@ func (ipt *IPTablesInstance) DeleteForwardByRule(iface string, proto string, dpo
 		"-p", proto,
 		"-m", proto,
 		"--dport", strconv.Itoa(dport),
-		"-m", "comment", "--comment", "fwdctl",
+		"-m", "comment", "--comment", label,
 		"-j", FwdTarget,
 		"--to-destination", saddr + ":" + strconv.Itoa(sport),
 	}
@@ -140,7 +140,7 @@ func (ipt *IPTablesInstance) DeleteAllForwards() error {
 			"-p", r[2],
 			"-m", r[2],
 			"--dport", r[3],
-			"-m", "comment", "--comment", "fwdctl",
+			"-m", "comment", "--comment", label,
 			"-j", FwdTarget,
 			"--to-destination", r[4] + ":" + r[5],
 		}
