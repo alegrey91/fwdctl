@@ -41,11 +41,20 @@ var applyCmd = &cobra.Command{
 
 		var wg sync.WaitGroup
 		chErr := make(chan error, len(ruleSet.Rules))
+		chLimit := make(chan int, 10)
 		rulesFileIsValid := true
 
 		for _, rule := range ruleSet.Rules {
 			wg.Add(1)
-			go ipt.Validate(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport, &wg, chErr)
+			// add slot to buffered channel
+			chLimit <- 1
+			go func(rule ipt.Rule, wg *sync.WaitGroup, chErr chan error, chLimit chan int) {
+				err := ipt.Validate(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+				wg.Done()
+				chErr <- err
+				// free slot from buffered channel
+				<-chLimit
+			}(rule, &wg, chErr, chLimit)
 		}
 		go func() {
 			wg.Wait()
