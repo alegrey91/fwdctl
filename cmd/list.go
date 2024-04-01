@@ -20,8 +20,8 @@ import (
 	"os"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
+	"github.com/alegrey91/fwdctl/internal/printer"
 	iptables "github.com/alegrey91/fwdctl/pkg/iptables"
-	"github.com/alegrey91/fwdctl/pkg/printer"
 	"github.com/spf13/cobra"
 )
 

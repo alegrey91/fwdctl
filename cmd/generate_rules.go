@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/alegrey91/fwdctl/pkg/template"
-	rt "github.com/alegrey91/fwdctl/pkg/template/rules_template"
+	"github.com/alegrey91/fwdctl/internal/template"
+	rt "github.com/alegrey91/fwdctl/internal/template/rules_template"
 	"github.com/spf13/cobra"
 )
 
