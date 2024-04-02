@@ -1,4 +1,4 @@
-package extractor
+package iptables
 
 import (
 	"reflect"

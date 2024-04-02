@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/alegrey91/fwdctl/internal/extractor"
 	"github.com/coreos/go-iptables/iptables"
 )
 
@@ -111,25 +110,12 @@ func (ipt *IPTablesInstance) DeleteAllForwards() error {
 	}
 
 	for _, rule := range fwdRules {
-		r, err := extractor.ExtractRuleInfo(rule)
+		r, err := ExtractRuleInfo(rule)
 		if err != nil {
 			return fmt.Errorf("error extracting rule info: %v", err)
 		}
 
-		iface := r[1]
-		proto := r[2]
-		dport, err := strconv.Atoi(r[3])
-		if err != nil {
-			return fmt.Errorf("error converting string '%s' to int: %v", r[3], err)
-		}
-		saddr := r[4]
-		sport, err := strconv.Atoi(r[5])
-		if err != nil {
-			return fmt.Errorf("error converting string '%s' to int: %v", r[5], err)
-		}
-
-		rule := NewRule(iface, proto, dport, saddr, sport)
-		err = ipt.Delete(FwdTable, FwdChain, rule.String()...)
+		err = ipt.Delete(FwdTable, FwdChain, r.String()...)
 		if err != nil {
 			return fmt.Errorf("error deleting rule: %v", err)
 		}
