@@ -44,20 +44,20 @@ exec fwdctl delete -n 1
         "proto": "udp",
         "dport": 3002,
         "saddr": "127.0.0.1",
-        "sport": 80,
+        "sport": 80
     },
     "0be1c5f4141015ca6a8e873344da06e6": {
         "iface": "lo",
         "proto": "tcp",
         "dport": 3000,
         "saddr": "127.0.0.1",
-        "sport": 80,
+        "sport": 80
     },
     "73d008929b591e12220cef0bb9a2710e": {
         "iface": "lo",
         "proto": "tcp",
         "dport": 3001,
         "saddr": "127.0.0.1",
-        "sport": 80,
+        "sport": 80
     }
 }

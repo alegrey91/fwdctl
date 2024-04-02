@@ -38,7 +38,7 @@ exec fwdctl ls
         "proto": "tcp",
         "dport": 3000,
         "saddr": "127.0.0.1",
-        "sport": 80,
+        "sport": 80
     }
 }
 -- list-yaml.txt --
