@@ -45,7 +45,7 @@ exec fwdctl delete -n 1
         "Dport": 3002,
         "Saddr": "127.0.0.1",
         "Sport": 80,
-		"Comment": ""
+        "Comment": ""
     },
     "0be1c5f4141015ca6a8e873344da06e6": {
         "Iface": "lo",
@@ -53,7 +53,7 @@ exec fwdctl delete -n 1
         "Dport": 3000,
         "Saddr": "127.0.0.1",
         "Sport": 80,
-		"Comment": ""
+        "Comment": ""
     },
     "73d008929b591e12220cef0bb9a2710e": {
         "Iface": "lo",
@@ -61,6 +61,6 @@ exec fwdctl delete -n 1
         "Dport": 3001,
         "Saddr": "127.0.0.1",
         "Sport": 80,
-		"Comment": ""
+        "Comment": ""
     }
 }
