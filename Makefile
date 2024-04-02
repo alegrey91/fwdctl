@@ -23,7 +23,7 @@ endif
 	go mod download
 	go build \
 		-v \
-      		-ldflags="-s -w -X 'github.com/alegrey91/fwdctl/internal/constants.Version=${GITHUB_REF_NAME }'" \
+      	-ldflags='-s -w -X "github.com/alegrey91/fwdctl/internal/constants.Version=${GITHUB_REF_NAME}"' \
 		-o ${BINARY_DIR}/${BINARY_NAME} \
 		.
 
