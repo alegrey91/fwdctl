@@ -27,35 +27,25 @@ func NewIPTablesInstance() (*IPTablesInstance, error) {
 	return &ipt, nil
 }
 
-func (ipt *IPTablesInstance) ValidateForward(iface string, proto string, dport int, saddr string, sport int) error {
-	return validate(iface, proto, dport, saddr, sport)
+func (ipt *IPTablesInstance) ValidateForward(rule *Rule) error {
+	return validate(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
 }
 
-func (ipt *IPTablesInstance) CreateForward(iface string, proto string, dport int, saddr string, sport int) error {
+func (ipt *IPTablesInstance) CreateForward(rule *Rule) error {
 	// example rule:
 	// iptables -t nat -A PREROUTING -i eth0 -p tcp -m tcp --dport 3000 -j DNAT --to-destination 192.168.199.105:80
-	ruleSpec := []string{
-		"-i", iface,
-		"-p", proto,
-		"-m", proto,
-		"--dport", strconv.Itoa(dport),
-		"-j", FwdTarget,
-		"--to-destination", saddr + ":" + strconv.Itoa(sport),
-		"-m", "comment",
-		"--comment", label,
-	}
 
 	// check if input interface exists on the system
-	ifaceExits, err := interfaceExists(iface)
+	ifaceExits, err := interfaceExists(rule.Iface)
 	if err != nil {
 		return fmt.Errorf("error reading interfaces: %v", err)
 	}
 	if !ifaceExits {
-		return fmt.Errorf("interface %s does not exists", iface)
+		return fmt.Errorf("interface %s does not exists", rule.Iface)
 	}
 
 	// check if provided rule already exists
-	ruleExists, err := ipt.Exists(FwdTable, FwdChain, ruleSpec...)
+	ruleExists, err := ipt.Exists(FwdTable, FwdChain, rule.String()...)
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
@@ -64,7 +54,7 @@ func (ipt *IPTablesInstance) CreateForward(iface string, proto string, dport int
 	}
 
 	// apply provided rule
-	err = ipt.AppendUnique(FwdTable, FwdChain, ruleSpec...)
+	err = ipt.AppendUnique(FwdTable, FwdChain, rule.String()...)
 	if err != nil {
 		return fmt.Errorf("rule failed: %v", err)
 	}
@@ -97,21 +87,11 @@ func (ipt *IPTablesInstance) DeleteForwardById(ruleId int) error {
 	return nil
 }
 
-func (ipt *IPTablesInstance) DeleteForwardByRule(iface string, proto string, dport int, saddr string, sport int) error {
+func (ipt *IPTablesInstance) DeleteForwardByRule(rule *Rule) error {
 	// TODO: create function to return []string with packed rule, passing iface, proto, etc as arguments.
-	ruleSpec := []string{
-		"-i", iface,
-		"-p", proto,
-		"-m", proto,
-		"--dport", strconv.Itoa(dport),
-		"-m", "comment", "--comment", label,
-		"-j", FwdTarget,
-		"--to-destination", saddr + ":" + strconv.Itoa(sport),
-	}
-
-	err := ipt.Delete(FwdTable, FwdChain, ruleSpec...)
+	err := ipt.Delete(FwdTable, FwdChain, rule.String()...)
 	if err != nil {
-		return fmt.Errorf("failed deleting rule: '%s'\n err: %v", ruleSpec, err)
+		return fmt.Errorf("failed deleting rule: '%s'\n err: %v", rule.String(), err)
 	}
 	return nil
 }
@@ -135,16 +115,21 @@ func (ipt *IPTablesInstance) DeleteAllForwards() error {
 		if err != nil {
 			return fmt.Errorf("error extracting rule info: %v", err)
 		}
-		ruleSpec := []string{
-			"-i", r[1],
-			"-p", r[2],
-			"-m", r[2],
-			"--dport", r[3],
-			"-m", "comment", "--comment", label,
-			"-j", FwdTarget,
-			"--to-destination", r[4] + ":" + r[5],
+
+		iface := r[1]
+		proto := r[2]
+		dport, err := strconv.Atoi(r[3])
+		if err != nil {
+			return fmt.Errorf("error converting string '%s' to int: %v", r[3], err)
 		}
-		err = ipt.Delete(FwdTable, FwdChain, ruleSpec...)
+		saddr := r[4]
+		sport, err := strconv.Atoi(r[5])
+		if err != nil {
+			return fmt.Errorf("error converting string '%s' to int: %v", r[5], err)
+		}
+
+		rule := NewRule(iface, proto, dport, saddr, sport)
+		err = ipt.Delete(FwdTable, FwdChain, rule.String()...)
 		if err != nil {
 			return fmt.Errorf("error deleting rule: %v", err)
 		}

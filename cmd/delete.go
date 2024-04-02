@@ -91,7 +91,7 @@ func deleteFromFile(ipt *iptables.IPTablesInstance, file string) {
 		os.Exit(1)
 	}
 	for _, rule := range rulesFile.Rules {
-		err := ipt.DeleteForwardByRule(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+		err := ipt.DeleteForwardByRule(&rule)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

@@ -80,13 +80,8 @@ func (rs *RuleSet) Diff(oldRS *RuleSet) error {
 		// if key in oldRules is not present in rs,
 		// then the old rule must be removed
 		if _, ok := rs.Rules[hash]; !ok {
-			err := ipt.DeleteForwardByRule(
-				oldRS.Rules[hash].Iface,
-				oldRS.Rules[hash].Proto,
-				oldRS.Rules[hash].Dport,
-				oldRS.Rules[hash].Saddr,
-				oldRS.Rules[hash].Sport,
-			)
+			rule := oldRS.Rules[hash]
+			err := ipt.DeleteForwardByRule(&rule)
 			if err != nil {
 				return fmt.Errorf("%v", err)
 			}
@@ -97,13 +92,8 @@ func (rs *RuleSet) Diff(oldRS *RuleSet) error {
 		// if key in rs in not present in oldRs,
 		// then the new rule must be added
 		if _, ok := oldRS.Rules[hash]; !ok {
-			err := ipt.CreateForward(
-				rs.Rules[hash].Iface,
-				rs.Rules[hash].Proto,
-				rs.Rules[hash].Dport,
-				rs.Rules[hash].Saddr,
-				rs.Rules[hash].Sport,
-			)
+			rule := oldRS.Rules[hash]
+			err := ipt.CreateForward(&rule)
 			if err != nil {
 				return fmt.Errorf("%v", err)
 			}
