@@ -59,7 +59,8 @@ your hypervisor, to external.
 			fmt.Printf("unable to get iptables instance: %v\n", err)
 			os.Exit(1)
 		}
-		err = ipt.CreateForward(iface, proto, dport, saddr, sport)
+		rule := iptables.NewRule(iface, proto, dport, saddr, sport)
+		err = ipt.CreateForward(rule)
 		if err != nil {
 			fmt.Println(err)
 			return

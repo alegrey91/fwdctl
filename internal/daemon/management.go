@@ -72,7 +72,7 @@ func Start(rulesFile string) {
 	}
 	// apply all the rules present in rulesFile
 	for ruleId, rule := range ruleSet.Rules {
-		err = ipt.CreateForward(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+		err = ipt.CreateForward(&rule)
 		if err != nil {
 			infoLogger.Printf("rule %s - %v\n", ruleId, err)
 		}
@@ -109,7 +109,7 @@ func Start(rulesFile string) {
 			case <-sigChnl:
 				// flush rules before exit
 				for _, rule := range ruleSet.Rules {
-					err := ipt.DeleteForwardByRule(rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport)
+					err := ipt.DeleteForwardByRule(&rule)
 					if err != nil {
 						errorLogger.Println(err)
 					}
