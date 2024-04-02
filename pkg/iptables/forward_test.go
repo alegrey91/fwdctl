@@ -56,6 +56,16 @@ func Test_validateForward(t *testing.T) {
 			errors.New("source port: '800000000' port number not allowed"),
 			true,
 		},
+		{
+			"shoudl_fail_destination_port",
+			"lo",
+			"tcp",
+			0,
+			"127.0.0.1",
+			8000,
+			errors.New("source port: '0' port number not allowed"),
+			true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

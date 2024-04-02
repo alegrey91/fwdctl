@@ -34,12 +34,11 @@ exec fwdctl ls
 -- list-json.txt --
 {
     "0be1c5f4141015ca6a8e873344da06e6": {
-        "Iface": "lo",
-        "Proto": "tcp",
-        "Dport": 3000,
-        "Saddr": "127.0.0.1",
-        "Sport": 80,
-        "Comment": ""
+        "iface": "lo",
+        "proto": "tcp",
+        "dport": 3000,
+        "saddr": "127.0.0.1",
+        "sport": 80,
     }
 }
 -- list-yaml.txt --
@@ -49,5 +48,4 @@ exec fwdctl ls
     dport: 3000
     saddr: 127.0.0.1
     sport: 80
-    comment: ""
 

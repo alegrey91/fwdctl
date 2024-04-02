@@ -53,13 +53,13 @@ var applyCmd = &cobra.Command{
 			wg.Add(1)
 			// add slot to buffered channel
 			chLimit <- 1
-			go func(rule *iptables.Rule, wg *sync.WaitGroup, chErr chan error, chLimit chan int) {
-				err := ipt.ValidateForward(rule)
+			go func(rule iptables.Rule, wg *sync.WaitGroup, chErr chan error, chLimit chan int) {
+				err := ipt.ValidateForward(&rule)
 				wg.Done()
 				chErr <- err
 				// free slot from buffered channel
 				<-chLimit
-			}(&rule, &wg, chErr, chLimit)
+			}(rule, &wg, chErr, chLimit)
 		}
 		go func() {
 			wg.Wait()

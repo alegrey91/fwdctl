@@ -7,12 +7,12 @@ import (
 )
 
 type Rule struct {
-	Iface   string `default:"lo"`
-	Proto   string `default:"tcp"`
-	Dport   int
-	Saddr   string
-	Sport   int
-	Comment string
+	Iface   string `json:"iface" yaml:"iface" default:"lo"`
+	Proto   string `json:"proto" yaml:"proto" default:"tcp"`
+	Dport   int    `json:"dport" yaml:"dport"`
+	Saddr   string `json:"saddr" yaml:"saddr"`
+	Sport   int    `json:"sport" yaml:"sport"`
+	Comment string `json:"comment,omitempty" yaml:"comment,omitempty"`
 }
 
 func NewRule(iface string, proto string, dport int, saddr string, sport int) *Rule {
