@@ -5,7 +5,7 @@ set -e
 BINARY_NAME="fwdctl"
 KERNEL_NAME=$(uname -s)
 MACHINE_HW_NAME=$(uname -m)
-BINARY_RELEASE_NAME="${BINARY_NAME}_${KERNEL_NAME}_${MACHINE_HW_NAME}"
+BINARY_RELEASE_NAME="${BINARY_NAME}"
 CHECKSUMS="checksums.txt"
 
 cd /tmp
