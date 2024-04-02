@@ -57,6 +57,21 @@ func ExtractRuleInfo(rawRule string) (*Rule, error) {
 			rule.Sport = sport
 		}
 	}
+	if rule.Iface == "" {
+		return nil, fmt.Errorf("missing iface value")
+	}
+	if rule.Proto == "" {
+		return nil, fmt.Errorf("missing proto value")
+	}
+	if rule.Dport == 0 {
+		return nil, fmt.Errorf("missing dport value")
+	}
+	if rule.Saddr == "" {
+		return nil, fmt.Errorf("missing saddr value")
+	}
+	if rule.Sport == 0 {
+		return nil, fmt.Errorf("missing sport value")
+	}
 
 	return rule, nil
 }
