@@ -9,24 +9,36 @@ func TestExtractRuleInfo(t *testing.T) {
 	tests := []struct {
 		name    string
 		rule    string
-		want    []string
+		want    *Rule
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 		{
 			name: "example_1",
 			rule: "-A PREROUTING -i lo -p tcp -m tcp --dport 3001 -m comment --comment fwdctl -j DNAT --to-destination 127.0.0.1:80",
-			want: []string{"", "lo", "tcp", "3001", "127.0.0.1", "80"},
+			want: &Rule{
+				Iface: "lo",
+				Proto: "tcp",
+				Dport: 3001,
+				Saddr: "127.0.0.1",
+				Sport: 80,
+			},
 		},
 		{
 			name: "example_2",
 			rule: "-A PREROUTING -i eth0 -p tcp -m tcp --dport 3001 -m comment --comment fwdctl -j DNAT --to-destination 127.0.0.1:80",
-			want: []string{"", "eth0", "tcp", "3001", "127.0.0.1", "80"},
+			want: &Rule{
+				Iface: "eth0",
+				Proto: "tcp",
+				Dport: 3001,
+				Saddr: "127.0.0.1",
+				Sport: 80,
+			},
 		},
 		{
 			name:    "example_3",
 			rule:    "-A PREROUTING -i eth0 -p tcp -m tcp --dport 3001 -m comment --comment fwdctl -j DNAT",
-			want:    []string{},
+			want:    nil,
 			wantErr: true,
 		},
 	}
