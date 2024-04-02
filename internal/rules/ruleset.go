@@ -92,7 +92,7 @@ func (rs *RuleSet) Diff(oldRS *RuleSet) error {
 		// if key in rs in not present in oldRs,
 		// then the new rule must be added
 		if _, ok := oldRS.Rules[hash]; !ok {
-			rule := oldRS.Rules[hash]
+			rule := rs.Rules[hash]
 			err := ipt.CreateForward(&rule)
 			if err != nil {
 				return fmt.Errorf("%v", err)
