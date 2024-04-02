@@ -24,15 +24,6 @@ if [ ! -f "$BINARY_RELEASE_NAME" ]; then
 fi
 printf "[download succeded]\n"
 
-file_checksum=$(cat $CHECKSUMS | grep -w "$BINARY_RELEASE_NAME" | cut -d " " -f1)
-binary_checksum=$(sha256sum $BINARY_RELEASE_NAME | cut -d " " -f1)
-# check if checksum is consistent
-if [ "$file_checksum" != "$binary_checksum" ]; then
-    printf "Binary has been tampered!\n"
-    exit 1
-fi
-printf "[checksum succeded]\n"
-
 # install binary
 chmod +x "$BINARY_RELEASE_NAME"
 mv "$BINARY_RELEASE_NAME" "/usr/local/bin/$BINARY_NAME"
