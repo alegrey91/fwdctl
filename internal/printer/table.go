@@ -1,10 +1,10 @@
 package printer
 
 import (
+	"fmt"
 	"os"
-	"strconv"
 
-	"github.com/alegrey91/fwdctl/internal/extractor"
+	"github.com/alegrey91/fwdctl/pkg/iptables"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -19,12 +19,19 @@ func (t *Table) PrintResult(ruleList map[int]string) error {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"number", "interface", "protocol", "external port", "internal ip", "internal port"})
 	for ruleId, rule := range ruleList {
-		tabRule, err := extractor.ExtractRuleInfo(rule)
+		tabRule, err := iptables.ExtractRuleInfo(rule)
 		if err != nil {
 			continue
 		}
-		tabRule[0] = strconv.Itoa(ruleId)
-		table.Append(tabRule)
+		tabRow := []string{
+			fmt.Sprintf("%d", ruleId),
+			tabRule.Iface,
+			tabRule.Proto,
+			fmt.Sprintf("%d", tabRule.Dport),
+			tabRule.Saddr,
+			fmt.Sprintf("%d", tabRule.Sport),
+		}
+		table.Append(tabRow)
 	}
 	table.Render()
 	return nil
