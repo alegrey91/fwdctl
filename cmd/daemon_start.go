@@ -17,9 +17,11 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/internal/daemon"
+	iptables "github.com/alegrey91/fwdctl/pkg/iptables"
 	"github.com/spf13/cobra"
 )
 
@@ -29,12 +31,17 @@ var daemonStartCmd = &cobra.Command{
 	Short: "Start fwdctl daemon",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		ipt, err := iptables.NewIPTablesInstance()
+		if err != nil {
+			fmt.Printf("unable to get iptables instance: %v\n", err)
+			os.Exit(1)
+		}
 		rulesFile, err := cmd.Flags().GetString("file")
 		if err != nil {
-			fmt.Println(err)
-			return
+			fmt.Printf("unable to read from flag: %v", err)
+			os.Exit(1)
 		}
-		daemon.Start(rulesFile)
+		daemon.Start(ipt, rulesFile)
 	},
 }
 

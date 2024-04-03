@@ -85,7 +85,12 @@ func init() {
 }
 
 func deleteFromFile(ipt *iptables.IPTablesInstance, file string) {
-	rulesFile, err := rules.NewRuleSetFromFile(file)
+	rulesContent, err := os.Open(file)
+	if err != nil {
+		fmt.Printf("error opening file: %v", err)
+		return
+	}
+	rulesFile, err := rules.NewRuleSetFromFile(rulesContent)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
