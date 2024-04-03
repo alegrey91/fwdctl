@@ -95,11 +95,17 @@ func Start(ipt *iptables.IPTablesInstance, rulesFile string) {
 		rsd := rules.Diff(ruleSet, newRuleSet)
 		// delete all the rules to be removed
 		for _, rule := range rsd.ToRemove {
-			ipt.DeleteForwardByRule(rule)
+			err = ipt.DeleteForwardByRule(rule)
+			if err != nil {
+				errorLogger.Println(err)
+			}
 		}
 		// create all the rules to be added
 		for _, rule := range rsd.ToAdd {
-			ipt.CreateForward(rule)
+			err = ipt.CreateForward(rule)
+			if err != nil {
+				errorLogger.Println(err)
+			}
 		}
 		// set the new rule set as the current one
 		ruleSet = newRuleSet
@@ -116,11 +122,9 @@ func Start(ipt *iptables.IPTablesInstance, rulesFile string) {
 			select {
 			case <-sigChnl:
 				// flush rules before exit
-				for _, rule := range ruleSet.Rules {
-					err := ipt.DeleteForwardByRule(&rule)
-					if err != nil {
-						errorLogger.Println(err)
-					}
+				err := ipt.DeleteAll()
+				if err != nil {
+					errorLogger.Println(err)
 				}
 				infoLogger.Println("daemon stopped")
 				exitcChnl <- true
