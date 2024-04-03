@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"os"
+	"io"
 
 	"github.com/alegrey91/fwdctl/pkg/iptables"
 	"gopkg.in/yaml.v2"
@@ -17,9 +17,9 @@ func NewRuleSet() *RuleSet {
 }
 
 // NewRuleSet return the struct that contains informations about rules
-func NewRuleSetFromFile(path string) (*RuleSet, error) {
+func NewRuleSetFromFile(file io.Reader) (*RuleSet, error) {
 	// Read rules from file
-	rulesFile, err := os.ReadFile(path)
+	rulesFile, err := io.ReadAll(file)
 	if err != nil {
 		return nil, fmt.Errorf("error reading file: %v", err)
 	}
@@ -66,38 +66,33 @@ func (rs *RuleSet) Remove(ruleHash string) {
 	delete(rs.Rules, ruleHash)
 }
 
-// Diff add and remove rules based on the differences
-// between the old and current rules set.
-// Return an error in case of fail, nil otherwise.
-func (rs *RuleSet) Diff(oldRS *RuleSet) error {
-	ipt, err := iptables.NewIPTablesInstance()
-	if err != nil {
-		fmt.Printf("unable to get iptables instance: %v\n", err)
-		os.Exit(1)
-	}
+type RuleSetDiff struct {
+	ToRemove []*iptables.Rule
+	ToAdd    []*iptables.Rule
+}
+
+// Diff method returns a *RuleSetDiff struct.
+// It contains a list of Rule(s) to be added / remove
+// in order to achieve the new RuleSet state.
+func Diff(oldRS, newRS *RuleSet) *RuleSetDiff {
+	ruleSetDiff := &RuleSetDiff{}
 	// loop over old rules set, to find rules to be removed
 	for hash := range oldRS.Rules {
 		// if key in oldRules is not present in rs,
 		// then the old rule must be removed
-		if _, ok := rs.Rules[hash]; !ok {
+		if _, ok := newRS.Rules[hash]; !ok {
 			rule := oldRS.Rules[hash]
-			err := ipt.DeleteForwardByRule(&rule)
-			if err != nil {
-				return fmt.Errorf("%v", err)
-			}
+			ruleSetDiff.ToRemove = append(ruleSetDiff.ToRemove, &rule)
 		}
 	}
 	// loop over new rules set, to find rules to be added
-	for hash := range rs.Rules {
+	for hash := range newRS.Rules {
 		// if key in rs in not present in oldRs,
 		// then the new rule must be added
 		if _, ok := oldRS.Rules[hash]; !ok {
-			rule := rs.Rules[hash]
-			err := ipt.CreateForward(&rule)
-			if err != nil {
-				return fmt.Errorf("%v", err)
-			}
+			rule := newRS.Rules[hash]
+			ruleSetDiff.ToAdd = append(ruleSetDiff.ToAdd, &rule)
 		}
 	}
-	return nil
+	return ruleSetDiff
 }

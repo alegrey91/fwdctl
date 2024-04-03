@@ -1,7 +1,6 @@
 package daemon
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -37,7 +36,7 @@ func banner() string {
 }
 
 // Start run fwdctl in daemon mode
-func Start(rulesFile string) {
+func Start(ipt *iptables.IPTablesInstance, rulesFile string) {
 	// Current implementation sucks.
 	// Code should be improved by removing
 	// useless and redundant code.
@@ -48,16 +47,10 @@ func Start(rulesFile string) {
 	// Anyway, for now, it works.
 	infoLogger.Println(banner())
 
-	ipt, err := iptables.NewIPTablesInstance()
-	if err != nil {
-		fmt.Printf("unable to get iptables instance: %v\n", err)
-		os.Exit(1)
-	}
-
-	err = createPidFile()
+	err := createPidFile()
 	if err != nil {
 		errorLogger.Println(err)
-		os.Exit(1)
+		return
 	}
 	defer func() {
 		err = removePidFile()
@@ -65,10 +58,15 @@ func Start(rulesFile string) {
 	infoLogger.Println("PID file created")
 
 	// preparing rule set from rules file
-	ruleSet, err := rules.NewRuleSetFromFile(rulesFile)
+	rulesContent, err := os.Open(rulesFile)
+	if err != nil {
+		errorLogger.Printf("error opening file: %v", err)
+		return
+	}
+	ruleSet, err := rules.NewRuleSetFromFile(rulesContent)
 	if err != nil {
 		errorLogger.Println(err)
-		os.Exit(1)
+		return
 	}
 	// apply all the rules present in rulesFile
 	for ruleId, rule := range ruleSet.Rules {
@@ -84,14 +82,24 @@ func Start(rulesFile string) {
 	v.SetConfigFile(rulesFile)
 	v.OnConfigChange(func(e fsnotify.Event) {
 		infoLogger.Println("configuration has changed")
-		newRuleSet, err := rules.NewRuleSetFromFile(rulesFile)
+		rulesContent, err := os.Open(rulesFile)
 		if err != nil {
-			errorLogger.Println(err)
-			os.Exit(1)
+			errorLogger.Printf("error opening file: %v", err)
+			return
 		}
-		err = newRuleSet.Diff(ruleSet)
+		newRuleSet, err := rules.NewRuleSetFromFile(rulesContent)
 		if err != nil {
 			errorLogger.Println(err)
+			return
+		}
+		rsd := rules.Diff(ruleSet, newRuleSet)
+		// delete all the rules to be removed
+		for _, rule := range rsd.ToRemove {
+			ipt.DeleteForwardByRule(rule)
+		}
+		// create all the rules to be added
+		for _, rule := range rsd.ToAdd {
+			ipt.CreateForward(rule)
 		}
 		// set the new rule set as the current one
 		ruleSet = newRuleSet
@@ -120,7 +128,6 @@ func Start(rulesFile string) {
 			}
 		}
 	}()
-
 	<-exitcChnl
 }
 

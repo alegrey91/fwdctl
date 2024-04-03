@@ -33,7 +33,12 @@ var applyCmd = &cobra.Command{
 	Long:    `apply rules described in a configuration file`,
 	Example: c.ProgramName + " apply --file rule.yml",
 	Run: func(cmd *cobra.Command, args []string) {
-		ruleSet, err := rules.NewRuleSetFromFile(c.RulesFile)
+		rulesContent, err := os.Open(c.RulesFile)
+		if err != nil {
+			fmt.Printf("error opening file: %v", err)
+			os.Exit(1)
+		}
+		ruleSet, err := rules.NewRuleSetFromFile(rulesContent)
 		if err != nil {
 			fmt.Printf("unable to open rules file: %v\n", err)
 			os.Exit(1)
