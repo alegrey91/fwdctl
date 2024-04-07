@@ -45,7 +45,7 @@ func NewSystemdService(serviceType, installationPath, rulesFile string) (*System
 	if !filepath.IsAbs(rulesFile) {
 		return nil, fmt.Errorf("rules file path is not absolute: %s", rulesFile)
 	}
-	if _, err := os.Stat(installationPath); errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(rulesFile); errors.Is(err, os.ErrNotExist) {
 		return nil, fmt.Errorf("rules file path does not exist: %s", rulesFile)
 	}
 
