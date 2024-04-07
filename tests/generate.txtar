@@ -3,6 +3,9 @@
 # if go is not installed, then skip
 [!exec:go] skip
 
+exec fwdctl generate
+stdout 'Usage:'
+
 exec fwdctl generate --help
 stdout 'Usage:'
 
