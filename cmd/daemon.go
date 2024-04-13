@@ -16,9 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 )
 
@@ -27,11 +24,7 @@ var daemonCmd = &cobra.Command{
 	Use:   "daemon",
 	Short: "Run fwdctl as deamon",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := cmd.Help()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		_ = cmd.Help()
 	},
 }
 
