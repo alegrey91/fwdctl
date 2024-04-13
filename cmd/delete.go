@@ -50,7 +50,7 @@ var deleteCmd = &cobra.Command{
 		if cmd.Flags().Lookup("id").Changed {
 			err := ipt.DeleteForwardById(ruleId)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Printf("%v\n", err)
 				os.Exit(1)
 			}
 			return
@@ -58,7 +58,11 @@ var deleteCmd = &cobra.Command{
 
 		// Loop over file content and delete rule one-by-one.
 		if cmd.Flags().Lookup("file").Changed {
-			deleteFromFile(ipt, file)
+			err := deleteFromFile(ipt, file)
+			if err != nil {
+				fmt.Printf("%v\n", err)
+				os.Exit(1)
+			}
 			return
 		}
 
@@ -72,6 +76,10 @@ var deleteCmd = &cobra.Command{
 		}
 
 		deleteFromFile(ipt, file)
+		if err != nil {
+			fmt.Printf("%v\n", err)
+			os.Exit(1)
+		}
 	},
 }
 
@@ -84,22 +92,20 @@ func init() {
 	deleteCmd.MarkFlagsMutuallyExclusive("id", "file", "all")
 }
 
-func deleteFromFile(ipt *iptables.IPTablesInstance, file string) {
+func deleteFromFile(ipt *iptables.IPTablesInstance, file string) error {
 	rulesContent, err := os.Open(file)
 	if err != nil {
-		fmt.Printf("error opening file: %v", err)
-		return
+		return fmt.Errorf("error opening file: %v", err)
 	}
 	rulesFile, err := rules.NewRuleSetFromFile(rulesContent)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return fmt.Errorf("error instantiating ruleset from file: %v", err)
 	}
 	for _, rule := range rulesFile.Rules {
 		err := ipt.DeleteForwardByRule(&rule)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			return fmt.Errorf("error deleting rule [%s %s %d %s %d]: %v", rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport, err)
 		}
 	}
+	return nil
 }
