@@ -118,3 +118,72 @@ rules:
 		})
 	}
 }
+
+func TestNewRuleSetFromFile(t *testing.T) {
+	type args struct {
+		file string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *RuleSet
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: "should_return_error",
+			args: args{
+				file: `
+{
+	"rules": {
+		"dport": 3000,
+		"saddr": "127.0.0.1",
+		"sport": 80,
+		"iface": "lo",
+		"proto": "tcp",
+	},
+}
+`,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "should_return_valid_resultset",
+			args: args{
+				file: `
+rules:
+- dport: 3000
+  saddr: 127.0.0.1
+  sport: 80
+  iface: lo
+  proto: tcp
+`,
+			},
+			want: &RuleSet{
+				Rules: map[string]iptables.Rule{
+					"0be1c5f4141015ca6a8e873344da06e6": {
+						Iface: "lo",
+						Proto: "tcp",
+						Dport: 3000,
+						Saddr: "127.0.0.1",
+						Sport: 80,
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewRuleSetFromFile(strings.NewReader(tt.args.file))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewRuleSetFromFile() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewRuleSetFromFile() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
