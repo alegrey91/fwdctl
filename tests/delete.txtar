@@ -51,6 +51,8 @@ exec fwdctl delete
 ! fwd_exists lo tcp 3001 127.0.0.1 80
 ! fwd_exists lo tcp 3002 127.0.0.1 80
 
+! exec fwdctl delete -f file_doesnt_exists.yml
+
 -- rules.yml --
 rules:
   - dport: 3000
