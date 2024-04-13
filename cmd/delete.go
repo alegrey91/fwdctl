@@ -75,7 +75,7 @@ var deleteCmd = &cobra.Command{
 			return
 		}
 
-		deleteFromFile(ipt, file)
+		err = deleteFromFile(ipt, file)
 		if err != nil {
 			fmt.Printf("%v\n", err)
 			os.Exit(1)
