@@ -16,9 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 )
 
@@ -32,14 +29,7 @@ var generateCmd = &cobra.Command{
 	Long: `generates templated file for fwdtcl
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			err := cmd.Help()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-			return
-		}
+		_ = cmd.Help()
 	},
 }
 
@@ -47,9 +37,5 @@ func init() {
 	rootCmd.AddCommand(generateCmd)
 
 	generateCmd.PersistentFlags().StringVarP(&outputFile, "output-path", "O", "", "output path")
-	err := generateCmd.MarkPersistentFlagRequired("output-path")
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
+	_ = generateCmd.MarkPersistentFlagRequired("output-path")
 }
