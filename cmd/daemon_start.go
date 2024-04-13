@@ -41,7 +41,9 @@ var daemonStartCmd = &cobra.Command{
 			fmt.Printf("unable to read from flag: %v", err)
 			os.Exit(1)
 		}
-		daemon.Start(ipt, rulesFile)
+		if res := daemon.Start(ipt, rulesFile); res != 0 {
+			os.Exit(1)
+		}
 	},
 }
 

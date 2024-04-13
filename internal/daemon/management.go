@@ -36,7 +36,7 @@ func banner() string {
 }
 
 // Start run fwdctl in daemon mode
-func Start(ipt *iptables.IPTablesInstance, rulesFile string) {
+func Start(ipt *iptables.IPTablesInstance, rulesFile string) int {
 	// Current implementation sucks.
 	// Code should be improved by removing
 	// useless and redundant code.
@@ -50,7 +50,7 @@ func Start(ipt *iptables.IPTablesInstance, rulesFile string) {
 	err := createPidFile()
 	if err != nil {
 		errorLogger.Println(err)
-		return
+		return 1
 	}
 	defer func() {
 		err = removePidFile()
@@ -61,12 +61,12 @@ func Start(ipt *iptables.IPTablesInstance, rulesFile string) {
 	rulesContent, err := os.Open(rulesFile)
 	if err != nil {
 		errorLogger.Printf("error opening file: %v", err)
-		return
+		return 1
 	}
 	ruleSet, err := rules.NewRuleSetFromFile(rulesContent)
 	if err != nil {
 		errorLogger.Println(err)
-		return
+		return 1
 	}
 	// apply all the rules present in rulesFile
 	for ruleId, rule := range ruleSet.Rules {
@@ -133,6 +133,7 @@ func Start(ipt *iptables.IPTablesInstance, rulesFile string) {
 		}
 	}()
 	<-exitcChnl
+	return 0
 }
 
 // Stop send a SIGTERM signal to the daemon process
