@@ -1,6 +1,9 @@
 # fwdctl
 
-![fwdctl](./fwdctl.png)
+<p align="center">
+    <img src="fwdctl.png" alt="fwdctl" width="200"/>
+</p>
+
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/alegrey91/fwdctl.svg)](https://pkg.go.dev/github.com/alegrey91/fwdctl)
 [![Go Report Card](https://goreportcard.com/badge/github.com/alegrey91/fwdctl)](https://goreportcard.com/report/github.com/alegrey91/fwdctl)
