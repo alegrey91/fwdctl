@@ -9,6 +9,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/alegrey91/fwdctl)](https://goreportcard.com/report/github.com/alegrey91/fwdctl)
 [![Go Coverage](https://github.com/alegrey91/fwdctl/wiki/coverage.svg)](https://raw.githack.com/wiki/alegrey91/fwdctl/coverage.html)
 ![https://img.shields.io/ossf-scorecard/github.com/alegrey91/fwdctl?label=openssf%20scorecard&style=flat](https://img.shields.io/ossf-scorecard/github.com/alegrey91/fwdctl?label=openssf%20scorecard&style=flat)
+[![Awesome](https://awesome.re/badge.svg)](https://github.com/avelino/awesome-go/)
 
 **fwdctl** is a simple and intuitive CLI to manage forwards in your **Linux** server.
 
