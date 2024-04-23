@@ -13,7 +13,7 @@ rules:
     saddr: 192.168.122.43
     sport: 22
     iface: eth1
-    proto: TCP
+    proto: tcp
   - dport: 3022
     saddr: 192.168.122.44
     sport: 22
