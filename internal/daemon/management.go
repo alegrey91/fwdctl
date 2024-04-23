@@ -36,15 +36,20 @@ func banner() string {
 }
 
 // Start run fwdctl in daemon mode
+// The flow has the following steps:
+// - Open the rules file
+// - Create all the defined forwards
+// - Start listening on rules file changes
+// - When file changes:
+//   - Calculate the Diff between old and new ruleset
+//   - Delete unwanted forwards
+//   - Create wanted forawrds
+//
+// - Listen for SIGTERM signals to gracefuly shutdown
+// - When SIGTERM signal occurs:
+//   - Delete all the applied forwards
+//   - Shutdown the daemon
 func Start(ipt *iptables.IPTablesInstance, rulesFile string) int {
-	// Current implementation sucks.
-	// Code should be improved by removing
-	// useless and redundant code.
-	// Also the ruleSet.Diff() method,
-	// should return a "path" to pass from
-	// A to B, without applying any changes.
-	// These should be done here.
-	// Anyway, for now, it works.
 	infoLogger.Println(banner())
 
 	err := createPidFile()
