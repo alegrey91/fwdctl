@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/alegrey91/fwdctl/internal/rules"
 	"github.com/alegrey91/fwdctl/pkg/iptables"
@@ -123,7 +122,6 @@ func Start(ipt *iptables.IPTablesInstance, rulesFile string) int {
 
 	go func() {
 		for {
-			time.Sleep(time.Second)
 			select {
 			case <-sigChnl:
 				// flush rules before exit
