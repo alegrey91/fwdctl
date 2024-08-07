@@ -50,6 +50,7 @@ var applyCmd = &cobra.Command{
 		g := new(errgroup.Group)
 		rulesFileIsValid := true
 
+		g.SetLimit(10)
 		for _, rule := range ruleSet.Rules {
 			r := &rule
 			g.Go(func() error {
