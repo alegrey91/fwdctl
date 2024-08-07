@@ -6,6 +6,9 @@
 exec fwdctl apply --help
 stdout 'Usage:'
 
+# remove all previously applied forwards
+exec fwdctl delete --all
+
 # test primarly subcommand 'apply'
 exec fwdctl apply --file rules-2.yaml
 fwd_exists lo tcp 3000 127.0.0.1 80
