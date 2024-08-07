@@ -17,11 +17,11 @@ package cmd
 
 import (
 	"fmt"
-	"os"
+
+	"github.com/spf13/cobra"
 
 	"github.com/alegrey91/fwdctl/internal/template"
 	rt "github.com/alegrey91/fwdctl/internal/template/rules_template"
-	"github.com/spf13/cobra"
 )
 
 // generateRulesCmd represents the generateRules command
@@ -30,13 +30,12 @@ var generateRulesCmd = &cobra.Command{
 	Short: "generates empty rules file",
 	Long: `generates empty rules file
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		rules := rt.NewRules()
-		err := template.GenerateTemplate(rules, outputFile)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+		if err := template.GenerateTemplate(rules, outputFile); err != nil {
+			return fmt.Errorf("generating template: %w", err)
 		}
+		return nil
 	},
 }
 

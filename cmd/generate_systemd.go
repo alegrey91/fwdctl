@@ -17,7 +17,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/internal/template"
@@ -34,17 +33,16 @@ var generateSystemdCmd = &cobra.Command{
 	Short: "generates systemd service file",
 	Long: `generates systemd service file to run fwdctl at boot
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		systemd, err := st.NewSystemdService(serviceType, installationPath, c.RulesFile)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			return fmt.Errorf("cannot create systemd service: %v", err)
 		}
-		err = template.GenerateTemplate(systemd, outputFile)
-		if err != nil {
-			fmt.Printf("error generating templated file: %v\n", err)
-			os.Exit(1)
+		
+		if err = template.GenerateTemplate(systemd, outputFile);err != nil {
+			return fmt.Errorf("generating templated file: %v", err)
 		}
+		return nil
 	},
 }
 

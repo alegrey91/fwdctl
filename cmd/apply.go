@@ -18,12 +18,13 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"sync"
+
+	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/internal/rules"
 	iptables "github.com/alegrey91/fwdctl/pkg/iptables"
-	"github.com/spf13/cobra"
 )
 
 // applyCmd represents the apply command
@@ -32,61 +33,47 @@ var applyCmd = &cobra.Command{
 	Short:   "apply rules from file",
 	Long:    `apply rules described in a configuration file`,
 	Example: c.ProgramName + " apply --file rule.yml",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		rulesContent, err := os.Open(c.RulesFile)
 		if err != nil {
-			fmt.Printf("error opening file: %v", err)
-			os.Exit(1)
+			return fmt.Errorf("opening file: %v", err)
 		}
 		ruleSet, err := rules.NewRuleSetFromFile(rulesContent)
 		if err != nil {
-			fmt.Printf("unable to open rules file: %v\n", err)
-			os.Exit(1)
+			return fmt.Errorf("unable to open rules file: %v", err)
 		}
 		ipt, err := iptables.NewIPTablesInstance()
 		if err != nil {
-			fmt.Printf("unable to get iptables instance: %v\n", err)
-			os.Exit(1)
+			return fmt.Errorf("unable to get iptables instance: %v", err)
 		}
 
-		var wg sync.WaitGroup
-		chErr := make(chan error, len(ruleSet.Rules))
-		chLimit := make(chan int, 10)
+		g := new(errgroup.Group)
 		rulesFileIsValid := true
 
+		g.SetLimit(10)
 		for _, rule := range ruleSet.Rules {
-			wg.Add(1)
-			// add slot to buffered channel
-			chLimit <- 1
-			go func(rule iptables.Rule, wg *sync.WaitGroup, chErr chan error, chLimit chan int) {
-				err := ipt.ValidateForward(&rule)
-				wg.Done()
-				chErr <- err
-				// free slot from buffered channel
-				<-chLimit
-			}(rule, &wg, chErr, chLimit)
+			r := &rule
+			g.Go(func() error {
+				err := ipt.ValidateForward(r)
+				if err != nil {
+					rulesFileIsValid = false
+				}
+				return err
+			})
 		}
-		go func() {
-			wg.Wait()
-			close(chErr)
-		}()
 
-		for err := range chErr {
-			if err != nil {
-				fmt.Printf("error validating rule: %v\n", err)
-				os.Exit(1)
-			}
+		if err := g.Wait(); err != nil {
+			return fmt.Errorf("validating rule: %v", err)
 		}
 
 		if rulesFileIsValid {
 			for ruleId, rule := range ruleSet.Rules {
-				err = ipt.CreateForward(&rule)
-				if err != nil {
-					fmt.Printf("error applying rule (%s): %v\n", ruleId, err)
-					os.Exit(1)
+				if err := ipt.CreateForward(&rule); err != nil {
+					return fmt.Errorf("applying rule (%s): %v", ruleId, err)
 				}
 			}
 		}
+		return nil
 	},
 }
 

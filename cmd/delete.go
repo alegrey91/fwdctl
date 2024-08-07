@@ -40,46 +40,38 @@ var deleteCmd = &cobra.Command{
 	Long: `Delete forward by passing a rule file or rule id.
 `,
 	Example: c.ProgramName + " delete -n 2",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ipt, err := iptables.NewIPTablesInstance()
 		if err != nil {
-			fmt.Printf("unable to get iptables instance: %v\n", err)
-			os.Exit(1)
+			return fmt.Errorf("unable to get iptables instance: %v", err)
 		}
 		// Delete rule number
 		if cmd.Flags().Lookup("id").Changed {
-			err := ipt.DeleteForwardById(ruleId)
-			if err != nil {
-				fmt.Printf("%v\n", err)
-				os.Exit(1)
+			if err := ipt.DeleteForwardById(ruleId); err != nil {
+				return fmt.Errorf("delete forward by ID: %v", err)
 			}
-			return
+			return nil
 		}
 
 		// Loop over file content and delete rule one-by-one.
 		if cmd.Flags().Lookup("file").Changed {
-			err := deleteFromFile(ipt, file)
-			if err != nil {
-				fmt.Printf("%v\n", err)
-				os.Exit(1)
+			if err := deleteFromFile(ipt, file); err != nil {
+				return fmt.Errorf("delete from file: %v", err)
 			}
-			return
+			return nil
 		}
 
 		if cmd.Flags().Lookup("all").Changed {
-			err := ipt.DeleteAllForwards()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
+			if err := ipt.DeleteAllForwards();err != nil {
+				return fmt.Errorf("delete all forwards: %v", err)
 			}
-			return
+			return nil
 		}
 
-		err = deleteFromFile(ipt, file)
-		if err != nil {
-			fmt.Printf("%v\n", err)
-			os.Exit(1)
+		if err = deleteFromFile(ipt, file);err != nil {
+			return fmt.Errorf("delete from file: %v", err)
 		}
+		return nil
 	},
 }
 

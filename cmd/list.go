@@ -17,7 +17,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
 	"github.com/alegrey91/fwdctl/internal/printer"
@@ -36,24 +35,21 @@ var listCmd = &cobra.Command{
 	Short:   "list forwards",
 	Long:    `list forwards made with iptables`,
 	Example: c.ProgramName + "list -o table",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error{
 		ipt, err := iptables.NewIPTablesInstance()
 		if err != nil {
-			fmt.Printf("unable to get iptables instance: %v\n", err)
-			os.Exit(1)
+			return fmt.Errorf("getting iptables instance: %v", err)
 		}
 		ruleList, err := ipt.ListForward(format)
 		if err != nil {
-			fmt.Println(err)
-			return
+			return fmt.Errorf("listing rules: %v", err)
 		}
 
 		p := printer.NewPrinter(format)
-		err = p.PrintResult(ruleList)
-		if err != nil {
-			fmt.Printf("failed printing results: %v", err)
-			return
+		if err = p.PrintResult(ruleList);err != nil {
+			return fmt.Errorf("printing result: %v", err)
 		}
+		return nil
 	},
 }
 

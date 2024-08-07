@@ -30,20 +30,19 @@ var daemonStartCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start fwdctl daemon",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error{
 		ipt, err := iptables.NewIPTablesInstance()
 		if err != nil {
-			fmt.Printf("unable to get iptables instance: %v\n", err)
-			os.Exit(1)
+			return fmt.Errorf("unable to get iptables instance: %v", err)
 		}
 		rulesFile, err := cmd.Flags().GetString("file")
 		if err != nil {
-			fmt.Printf("unable to read from flag: %v", err)
-			os.Exit(1)
+			return fmt.Errorf("unable to read from flag: %v", err)
 		}
 		if res := daemon.Start(ipt, rulesFile); res != 0 {
 			os.Exit(1)
 		}
+		return nil
 	},
 }
 
