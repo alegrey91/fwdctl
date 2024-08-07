@@ -6,6 +6,9 @@
 exec fwdctl daemon
 stdout 'Usage:'
 
+# remove all previously applied forwards
+exec fwdctl delete --all
+
 exec fwdctl daemon --help
 stdout 'Usage:'
 

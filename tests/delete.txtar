@@ -6,6 +6,9 @@
 exec fwdctl delete --help
 stdout 'Usage:'
 
+# remove all previously applied forwards
+exec fwdctl delete --all
+
 # delete e simple rule by passing id
 exec fwdctl create -d 3000 -s 127.0.0.1 -p 80 -i lo
 fwd_exists lo tcp 3000 127.0.0.1 80
