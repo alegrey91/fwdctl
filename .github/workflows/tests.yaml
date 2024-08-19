@@ -98,6 +98,10 @@ jobs:
             -run TestFwdctl/strace \
             -args -test.gocoverdir=/tmp/integration/
 
+      - name: check files have been created
+        run: |
+          cat syscalls/*.log
+
       - name: Upload cover profiles
         uses: actions/upload-artifact@v3
         with:
