@@ -5,3 +5,4 @@
 
 strace fwdctl list -h
 stdout 'Usage:'
+exec cat syscalls/strace-*.log
