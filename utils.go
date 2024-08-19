@@ -86,8 +86,9 @@ func strace(ts *testscript.TestScript, neg bool, args []string) {
 
 	syscalls := processStraceOutput(stderrBuf.String())
 	if err := os.WriteFile(outputFile, []byte(syscalls), 0644); err != nil {
-		ts.Logf("strace output saved to %s", outputFile)
+		ts.Fatalf("error saving strace output to %s", outputFile)
 	}
+	ts.Logf("strace output saved to %s", outputFile)
 }
 
 func processStraceOutput(output string) string {
