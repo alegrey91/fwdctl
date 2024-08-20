@@ -84,6 +84,7 @@ func strace(ts *testscript.TestScript, neg bool, args []string) {
 
 	fmt.Fprintf(ts.Stdout(), "%s", stdoutBuf.String())
 
+	fmt.Fprintf(ts.Stdout(), "%s", stderrBuf.String())
 	syscalls := processStraceOutput(stderrBuf.String())
 	if err := os.WriteFile(outputFile, []byte(syscalls), 0644); err != nil {
 		ts.Fatalf("error saving strace output to %s", outputFile)
