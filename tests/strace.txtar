@@ -5,6 +5,3 @@
 
 strace fwdctl list -h
 stdout 'Usage:'
-
-# remove all previously applied forwards
-strace fwdctl delete --all
