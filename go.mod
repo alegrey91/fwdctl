@@ -1,6 +1,6 @@
 module github.com/alegrey91/fwdctl
 
-go 1.22.5
+go 1.22
 
 require (
 	github.com/coreos/go-iptables v0.6.1-0.20220901214115-d2b8608923d1
