@@ -1,17 +1,19 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
+	"regexp"
 	"time"
 
 	"github.com/alegrey91/fwdctl/pkg/iptables"
 	goiptables "github.com/coreos/go-iptables/iptables"
 	"github.com/rogpeppe/go-internal/testscript"
+	"github.com/u-root/u-root/pkg/strace"
 )
 
 func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
@@ -47,7 +49,7 @@ func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
 	}
 }
 
-func strace(ts *testscript.TestScript, neg bool, args []string) {
+func straceCmd(ts *testscript.TestScript, neg bool, args []string) {
 	if len(args) < 1 {
 		ts.Fatalf("syntax: strace needs at least one argument")
 	}
@@ -62,17 +64,16 @@ func strace(ts *testscript.TestScript, neg bool, args []string) {
 	outputFile := filepath.Join(outputDir, fmt.Sprintf("strace-%s.log", timestamp))
 
 	// Prepare the command to execute with strace, filtering only system calls
-	straceArgs := []string{"-f", "-e", "trace=all"}
-	straceArgs = append(straceArgs, args...)
-	strace := exec.Command("strace", straceArgs...)
+	tracedCmd := exec.Command(args[0], args[1:]...)
 
 	var stdoutBuf bytes.Buffer
-	strace.Stdout = &stdoutBuf
+	tracedCmd.Stdout = &stdoutBuf
 	var stderrBuf bytes.Buffer
-	strace.Stderr = &stderrBuf
+	tracedCmd.Stderr = &stderrBuf
 
 	// Run the command
-	if err := strace.Run(); err != nil {
+	writer := new(bytes.Buffer)
+	if err := strace.Strace(tracedCmd, writer); err != nil {
 		if !neg {
 			ts.Fatalf("command failed: %v", err)
 		}
@@ -84,39 +85,59 @@ func strace(ts *testscript.TestScript, neg bool, args []string) {
 
 	fmt.Fprintf(ts.Stdout(), "%s", stdoutBuf.String())
 
-	fmt.Fprintf(ts.Stdout(), "%s", stderrBuf.String())
-	syscalls := processStraceOutput(stderrBuf.String())
-	if err := os.WriteFile(outputFile, []byte(syscalls), 0644); err != nil {
-		ts.Fatalf("error saving strace output to %s", outputFile)
+	syscalls, err := processStraceOutput(writer.String())
+	if err != nil {
+		ts.Fatalf("error processing strace output: %v", err)
 	}
+
+	err = writeToFile(outputFile, syscalls)
+	if err != nil {
+		ts.Fatalf("error creating file: %v", err)
+	}
+
 	ts.Logf("strace output saved to %s", outputFile)
 }
 
-func processStraceOutput(output string) string {
-	lines := strings.Split(output, "\n")
+func writeToFile(outputFile string, syscalls []string) error {
+	file, err := os.OpenFile(outputFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
-	// Use a map to store unique system call names
-	syscalls := make(map[string]struct{})
+	if err != nil {
+		return fmt.Errorf("failed creating file: %s", err)
+	}
 
-	// Iterate over each line and extract the system call name
-	for _, line := range lines {
-		// Extract the system call name before the first '('
-		if idx := strings.Index(line, "("); idx != -1 {
-			syscall := strings.TrimSpace(line[:idx])
-			if syscall != "" {
-				syscalls[syscall] = struct{}{}
-			}
+	datawriter := bufio.NewWriter(file)
+
+	for _, data := range syscalls {
+		_, _ = datawriter.WriteString(data + "\n")
+	}
+	datawriter.Flush()
+	file.Close()
+	return nil
+}
+
+func processStraceOutput(straceOutput string) ([]string, error) {
+	// Regular expression to match system calls in the format "[pid xxx] E syscall("
+	re := regexp.MustCompile(`\[pid \d+\] E (\w+)\(`)
+
+	// Find all matches of the pattern in the strace output
+	matches := re.FindAllStringSubmatch(straceOutput, -1)
+
+	// Use a map to keep track of unique system calls
+	systemCalls := make(map[string]struct{})
+
+	for _, match := range matches {
+		if len(match) > 1 {
+			systemCalls[match[1]] = struct{}{}
 		}
 	}
 
-	// Convert the map keys to a slice to get unique system call names
-	var syscallList []string
-	for syscall := range syscalls {
-		syscallList = append(syscallList, syscall)
+	// Convert map keys to a slice
+	var result []string
+	for call := range systemCalls {
+		result = append(result, call)
 	}
 
-	// Join the unique system call names into a single string, one per line
-	return strings.Join(syscallList, "\n")
+	return result, nil
 }
 
 func customCommands() map[string]func(ts *testscript.TestScript, neg bool, args []string) {
@@ -125,6 +146,6 @@ func customCommands() map[string]func(ts *testscript.TestScript, neg bool, args 
 		// fwd_exists check that the given forward exists
 		// invoke as "fwd_exists iface proto dest_port src_addr src_port"
 		"fwd_exists": fwdExists,
-		"strace":     strace,
+		"strace":     straceCmd,
 	}
 }
