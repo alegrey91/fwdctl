@@ -2,8 +2,6 @@ module github.com/alegrey91/fwdctl
 
 go 1.21
 
-toolchain go1.22.5
-
 require (
 	github.com/coreos/go-iptables v0.6.1-0.20220901214115-d2b8608923d1
 	github.com/fsnotify/fsnotify v1.7.0
