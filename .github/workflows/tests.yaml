@@ -198,7 +198,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: unit-test-syscalls
-          path: ./unit-test-syscalls
+          path: unit-test-syscalls
 
 #      - uses: actions/download-artifact@v3
 #        with:
