@@ -179,7 +179,7 @@ jobs:
         run: |
           harpoon hunt \
             --file harpoon-report.yml \
-            --directory unit-test
+            --directory unit-test \
             --save
 
       - name: Upload metadata from unit-tests
