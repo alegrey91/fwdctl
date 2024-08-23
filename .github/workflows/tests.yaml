@@ -171,13 +171,13 @@ jobs:
 
       - name: Analyze binaries
         run: |
-          harpoon analyze \
+          sudo harpoon analyze \
             --exclude .git/ \
             --save
 
       - name: Trace system calls
         run: |
-          harpoon hunt \
+          sudo harpoon hunt \
             --file harpoon-report.yml \
             --directory unit-test-syscalls \
             --save
@@ -225,7 +225,7 @@ jobs:
 
       - name: Build Seccomp Profile
         run: |
-          harpoon build \
+          sudo harpoon build \
             --directory harpoon/ \
             --save \
             --name fwdctl-seccomp.json
