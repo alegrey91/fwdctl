@@ -179,6 +179,7 @@ jobs:
         run: |
           harpoon hunt \
             --file harpoon-report.yml \
+            --directory unit-test
             --save
 
       - name: Upload metadata from unit-tests
@@ -220,6 +221,6 @@ jobs:
       - name: Build Seccomp Profile
         run: |
           harpoon build \
-            -D harpoon/ \
-            -S \
-            -n fwdctl-seccomp.json
+            --directory harpoon/ \
+            --save \
+            --name fwdctl-seccomp.json
