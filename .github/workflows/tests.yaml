@@ -95,6 +95,7 @@ jobs:
             -cover \
             -v ./... \
             -run TestFwdctl/version \
+            -args -test.gocoverdir=/tmp/integration/
            go test \
             -exec sudo \
             -cover \
