@@ -1,0 +1,5 @@
+tracesyscalls /usr/local/bin/fwdctl list --help
+stdout 'Usage:'
+
+# remove all previously applied forwards
+tracesyscalls /usr/local/bin/fwdctl delete --all
