@@ -95,6 +95,11 @@ jobs:
             -cover \
             -v ./... \
             -run TestFwdctl/version \
+           go test \
+            -exec sudo \
+            -cover \
+            -v ./... \
+            -run TestFwdctl/strace \
             -args -test.gocoverdir=/tmp/integration/
 
       - name: Upload cover profiles
