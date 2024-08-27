@@ -194,6 +194,84 @@ jobs:
           name: unit-test-syscalls
           path: unit-test-syscalls
 
+  trace-integration-test:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # ratchet:actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # ratchet:actions/setup-go@v4
+        with:
+          go-version: '1.22'
+
+      - name: Install iptables
+        run: |
+          sudo apt update
+          sudo apt install -y iptables
+
+      - name: Build coverage-instrumented binary
+        run: |
+          make build-cover && sudo make -B install
+
+      - name: Run integration test
+        env:
+          TRACING: "true"
+        run: |
+          mkdir /tmp/integration
+          # we have to run integration tests one-by-one
+          # otherwhise they will run in parallel.
+          # since fwdctl apply network forwards, these could 
+          # interact with each other and make the test fail.
+          go test \
+            -exec sudo \
+            -cover \
+            -tracing \
+            -v ./... \
+            -run TestFwdctl/apply
+          go test \
+            -exec sudo \
+            -cover \
+            -tracing \
+            -v ./... \
+            -run TestFwdctl/create
+          go test \
+            -exec sudo \
+            -cover \
+            -tracing \
+            -v ./... \
+            -run TestFwdctl/delete
+          go test \
+            -exec sudo \
+            -cover \
+            -tracing \
+            -v ./... \
+            -run TestFwdctl/list
+          go test \
+            -exec sudo \
+            -cover \
+            -tracing \
+            -v ./... \
+            -run TestFwdctl/daemon
+          go test \
+            -exec sudo \
+            -cover \
+            -tracing \
+            -v ./... \
+            -run TestFwdctl/version
+           go test \
+            -exec sudo \
+            -cover \
+            -tracing \
+            -v ./... \
+            -run TestFwdctl/strace
+
+      - name: Upload cover profiles
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-syscalls
+          path: integration-test-syscalls
+
   build-seccomp-profile:
 
     runs-on: ubuntu-latest
