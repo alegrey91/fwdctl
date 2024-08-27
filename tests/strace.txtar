@@ -1,5 +1,0 @@
-exec_cmd fwdctl list --help
-stdout 'Usage:'
-
-# remove all previously applied forwards
-exec_cmd fwdctl delete --all

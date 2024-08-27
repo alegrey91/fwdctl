@@ -7,12 +7,6 @@ import (
 	"github.com/rogpeppe/go-internal/testscript"
 )
 
-var trace bool
-
-func init() {
-	flag.BoolVar(&trace, "tracing", false, "Trace syscalls from integration-tests")
-}
-
 func TestFwdctl(t *testing.T) {
 	flag.Parse()
 	testscript.Run(t, testscript.Params{
@@ -21,9 +15,6 @@ func TestFwdctl(t *testing.T) {
 		RequireExplicitExec: true,
 		Setup: func(env *testscript.Env) error {
 			env.Setenv("GOCOVERDIR", "/tmp/integration")
-			if trace {
-				env.Setenv("TRACING", "true")
-			}
 			return nil
 		},
 	})
