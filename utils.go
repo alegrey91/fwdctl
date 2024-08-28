@@ -43,6 +43,7 @@ func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
 	}
 }
 
+//nolint:all
 func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	tracing := ts.Getenv("TRACING")
 	var err error
@@ -77,6 +78,7 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	}
 }
 
+//nolint:all
 func getRandomString() string {
 	b := make([]byte, 4) // 4 bytes will give us 6 base64 characters
 	_, err := rand.Read(b)
