@@ -16,7 +16,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # ratchet:actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.22'
 
       - name: Run Unit-Test
         run: |
@@ -42,7 +42,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # ratchet:actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.22'
+
+      - name: Install iptables
+        run: |
+          sudo apt update
+          sudo apt install -y iptables
 
       - name: Build coverage-instrumented binary
         run: |
@@ -103,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [unit-test,integration-test]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # ratchet:actions/checkout@v3
 
       - uses: actions/download-artifact@v3
         with:
@@ -123,7 +128,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.22'
 
       - name: Calculate total coverage
         run: |
@@ -144,3 +149,89 @@ jobs:
           amend: true
           coverage-file: ./code-coverage
 
+  trace-unit-test:
+
+    runs-on: ubuntu-latest
+    needs: [unit-test]
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # ratchet:actions/checkout@v3
+
+      - name: Build coverage-instrumented binary
+        run: |
+          make build-cover && sudo make -B install
+
+      - name: Set up Go
+        uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # ratchet:actions/setup-go@v4
+        with:
+          go-version: '1.22'
+
+      - name: Install harpoon
+        run: |
+          curl -s https://raw.githubusercontent.com/alegrey91/harpoon/main/install | sudo sh
+
+      - name: Analyze binaries
+        run: |
+          sudo harpoon analyze \
+            --exclude .git/ \
+            --save
+
+      - name: Trace system calls
+        run: |
+          sudo harpoon hunt \
+            --file harpoon-report.yml \
+            --directory unit-test-syscalls \
+            --save
+
+      - name: Upload metadata from unit-tests
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # ratchet:actions/upload-artifact@v3
+        with:
+          name: unit-test-syscalls
+          path: unit-test-syscalls
+
+  build-seccomp-profile:
+
+    runs-on: ubuntu-latest
+    needs: [trace-unit-test]
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # ratchet:actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: unit-test-syscalls
+          path: unit-test-syscalls
+
+#      - uses: actions/download-artifact@v3
+#        with:
+#          name: integration-test
+#          path: ./integration-test
+
+      - name: list files
+        run: |
+          ls -lah ./unit-test-syscalls
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+
+      - name: Install harpoon
+        run: |
+          curl -s https://raw.githubusercontent.com/alegrey91/harpoon/main/install | sudo sh
+
+      - name: Create unique directory
+        run: |
+          mkdir -p harpoon
+          mv unit-test-syscalls/* harpoon/
+
+      - name: Build Seccomp Profile
+        run: |
+          sudo harpoon build \
+            --directory harpoon/ \
+            --save \
+            --name fwdctl-seccomp.json
+
+      - name: Upload seccomp profile
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # ratchet:actions/upload-artifact@v3
+        with:
+          name: fwdctl-seccomp.json
+          path: fwdctl-seccomp.json
