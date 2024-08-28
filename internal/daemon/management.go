@@ -132,6 +132,7 @@ func Start(ipt *iptables.IPTablesInstance, rulesFile string) int {
 				infoLogger.Println("daemon stopped")
 				exitcChnl <- true
 			default:
+				continue
 			}
 		}
 	}()
