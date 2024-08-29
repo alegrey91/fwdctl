@@ -218,7 +218,7 @@ jobs:
           go test \
             -exec sudo \
             -v ./... \
-            -run TestFwdctl/daemon \
+            -run TestFwdctl/daemon_trace \
             -- -tracing
 
       - name: Upload cover profiles
