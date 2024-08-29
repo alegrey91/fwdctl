@@ -42,15 +42,14 @@ fwd_exists lo udp 1111 127.0.0.1 22
 # should remove all the rules since the rules file is empty
 exec cp rules-4.yml rules.yml
 exec sleep 5
-exec_cmd /usr/local/bin/fwdctl list -o json
+exec /usr/local/bin/fwdctl list -o json
 cmp stdout empty-output.txt
 
 # should not apply rules if file is not valid
 exec cp rules-5.yml rules.yml
 exec sleep 5
-exec_cmd /usr/local/bin/fwdctl list -o json
+exec /usr/local/bin/fwdctl list -o json
 exec /usr/local/bin/fwdctl daemon stop
-exec /usr/local/bin/fwdctl daemon stp
 
 -- rules.yml --
 rules:

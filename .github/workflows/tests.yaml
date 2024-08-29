@@ -206,7 +206,7 @@ jobs:
 
       - name: Build coverage-instrumented binary
         run: |
-          make build-cover && sudo make -B install
+          make build && sudo make -B install
 
       - name: Run integration test
         run: |
@@ -224,8 +224,8 @@ jobs:
       - name: Upload cover profiles
         uses: actions/upload-artifact@v3
         with:
-          name: integration-test
-          path: /tmp/integration/
+          name: integration-test-syscalls
+          path: integration-test-syscalls
   build-seccomp-profile:
 
     runs-on: ubuntu-latest
@@ -238,14 +238,15 @@ jobs:
           name: unit-test-syscalls
           path: unit-test-syscalls
 
-#      - uses: actions/download-artifact@v3
-#        with:
-#          name: integration-test
-#          path: ./integration-test
+      - uses: actions/download-artifact@v3
+        with:
+          name: integration-test-syscalls
+          path: ./integration-test-syscalls
 
       - name: list files
         run: |
           ls -lah ./unit-test-syscalls
+          ls -lah ./integration-test-syscalls
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -260,6 +261,7 @@ jobs:
         run: |
           mkdir -p harpoon
           mv unit-test-syscalls/* harpoon/
+          mv integration-test-syscalls/* harpoon/
 
       - name: Build Seccomp Profile
         run: |
