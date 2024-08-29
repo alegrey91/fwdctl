@@ -3,6 +3,8 @@ package main
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"os/exec"
+	"regexp"
 	"strings"
 
 	"github.com/alegrey91/fwdctl/pkg/iptables"
@@ -47,8 +49,13 @@ func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
 func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	tracing := ts.Getenv("TRACING")
 	var err error
+	var backgroundSpecifier = regexp.MustCompile(`^&([a-zA-Z_0-9]+&)?$`)
 	if tracing != "true" {
 		ts.Logf("executing command: %s", strings.Join(args, " "))
+		if backgroundSpecifier.MatchString(args[len(args)-1]) {
+			execBackground(args[0], args[1:]...)
+			return
+		}
 		err = ts.Exec(args[0], args[1:]...)
 	} else {
 		//uuid := getRandomString()
@@ -60,13 +67,18 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 			"--save",
 			"--directory",
 			"integration-test-syscalls",
-			"--include-cmd-output",
+			"--include-cmd-stdout",
+			"--include-cmd-stderr",
 			//"--name",
 			//fmt.Sprintf("main_main_%s", uuid),
 			"--",
 		}
 		customCommand = append(customCommand, args...)
 		ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
+		if backgroundSpecifier.MatchString(args[len(args)-1]) {
+			execBackground(args[0], args[1:]...)
+			return
+		}
 		err = ts.Exec(customCommand[0], customCommand[1:]...)
 	}
 	if err != nil {
@@ -76,6 +88,14 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 		}
 		ts.Fatalf("error: %v", err)
 	}
+}
+
+func execBackground(command string, args ...string) {
+	cmd := exec.Command(command, args...)
+	var stdoutBuf, stderrBuf strings.Builder
+	cmd.Stdout = &stdoutBuf
+	cmd.Stderr = &stderrBuf
+	cmd.Start()
 }
 
 //nolint:all
