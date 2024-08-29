@@ -219,7 +219,7 @@ jobs:
             -exec sudo \
             -v ./... \
             -run TestFwdctl/daemon \
-            -args -tracing
+            -- -tracing
 
       - name: Upload cover profiles
         uses: actions/upload-artifact@v3
