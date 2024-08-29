@@ -50,6 +50,7 @@ exec cp rules-5.yml rules.yml
 exec sleep 5
 exec_cmd /usr/local/bin/fwdctl list -o json
 exec /usr/local/bin/fwdctl daemon stop
+exec /usr/local/bin/fwdctl daemon stp
 
 -- rules.yml --
 rules:
