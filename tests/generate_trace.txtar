@@ -1,0 +1,78 @@
+# this testscript test the 'generate' command
+
+# if go is not installed, then skip
+[!exec:go] skip
+
+exec_cmd fwdctl generate
+stdout 'Usage:'
+
+exec_cmd fwdctl generate --help
+stdout 'Usage:'
+
+# test 'generate rules' command
+exec_cmd fwdctl generate rules --help
+stdout 'Usage:'
+
+! exec_cmd fwdctl generate rules -O rules.yaml
+stdout 'destinationPath path is not absolute\n'
+
+! exec_cmd fwdctl generate rules -O /tmp/rules.yaml
+
+exec_cmd fwdctl generate rules -O /tmp/
+exists /tmp/rules.yml
+cmp /tmp/rules.yml rules.yml
+
+# test 'generate systemd' command
+exec_cmd fwdctl generate systemd --help
+stdout 'Usage:'
+
+! exec_cmd fwdctl generate systemd --file /tmp/rules.yml
+! exec_cmd fwdctl generate systemd --installation-path /usr/local/bin
+! exec_cmd fwdctl generate systemd --type "fork"
+! exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type fork
+
+# test with options '--type oneshot' (default)
+exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin -O /tmp/
+cmp /tmp/fwdctl.service fwdctl-oneshot.service
+
+# test with options '--type fork'
+exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type fork -O /tmp/
+cmp /tmp/fwdctl.service fwdctl-fork.service
+
+# test with options '--type null' (does not exist)
+! exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type null -O /tmp/
+
+-- rules.yml --
+rules:
+  - dport:
+    saddr:
+    sport:
+    iface:
+    proto:
+-- fwdctl-oneshot.service --
+[Unit]
+Description=fwdctl systemd service
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/fwdctl apply --file=/tmp/rules.yml
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
+-- fwdctl-fork.service --
+[Unit]
+Description=fwdctl systemd service
+After=network.target
+
+[Service]
+Type=fork
+ExecStart=/usr/local/bin/fwdctl daemon start --file=/tmp/rules.yml
+ExecStop=/usr/local/bin/fwdctl daemon stop
+Restart=always
+RestartSec=5s
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target

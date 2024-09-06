@@ -1,0 +1,14 @@
+# this testscript test the 'apply' command
+
+# if go is not installed, then skip
+[!exec:go] skip
+
+exec_cmd fwdctl version --help
+stdout 'Usage:'
+
+exec_cmd fwdctl version
+stdout 'dev'
+
+# use an invalid argument
+! exec_cmd fwdctl version -x
+stderr 'Usage:'

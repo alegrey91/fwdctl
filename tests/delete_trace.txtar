@@ -1,0 +1,75 @@
+# this testscript test the 'delete' command
+
+# if go is not installed, then skip
+[!exec:go] skip
+
+exec_cmd fwdctl delete --help
+stdout 'Usage:'
+
+# remove all previously applied forwards
+exec_cmd fwdctl delete --all
+
+# delete e simple rule by passing id
+exec fwdctl create -d 3000 -s 127.0.0.1 -p 80 -i lo
+fwd_exists lo tcp 3000 127.0.0.1 80
+exec_cmd fwdctl delete -n 1
+
+# delete list of rules by using a rules.yml file
+exec fwdctl create -d 3000 -s 127.0.0.1 -p 80 -i lo
+fwd_exists lo tcp 3000 127.0.0.1 80
+exec fwdctl create -d 3001 -s 127.0.0.1 -p 80 -i lo
+fwd_exists lo tcp 3001 127.0.0.1 80
+exec fwdctl create -d 3002 -s 127.0.0.1 -p 80 -i lo
+fwd_exists lo tcp 3002 127.0.0.1 80
+exec_cmd fwdctl delete --file rules.yml
+
+# delete multiple ids
+exec fwdctl apply -f rules.yml
+fwd_exists lo tcp 3000 127.0.0.1 80
+fwd_exists lo tcp 3001 127.0.0.1 80
+fwd_exists lo tcp 3002 127.0.0.1 80
+exec_cmd fwdctl delete -n 3
+exec_cmd fwdctl delete -n 2
+exec_cmd fwdctl delete -n 1
+
+# create forwards and then delete them with '--all#
+exec fwdctl apply -f rules.yml
+fwd_exists lo tcp 3000 127.0.0.1 80
+fwd_exists lo tcp 3001 127.0.0.1 80
+fwd_exists lo tcp 3002 127.0.0.1 80
+exec_cmd fwdctl delete --all
+! fwd_exists lo tcp 3000 127.0.0.1 80
+! fwd_exists lo tcp 3001 127.0.0.1 80
+! fwd_exists lo tcp 3002 127.0.0.1 80
+
+# unable to use all the flags at the same time
+! exec_cmd fwdctl delete -n 1 -a -f rules.yml
+
+exec fwdctl apply
+fwd_exists lo tcp 3000 127.0.0.1 80
+fwd_exists lo tcp 3001 127.0.0.1 80
+fwd_exists lo tcp 3002 127.0.0.1 80
+exec_cmd fwdctl delete
+! fwd_exists lo tcp 3000 127.0.0.1 80
+! fwd_exists lo tcp 3001 127.0.0.1 80
+! fwd_exists lo tcp 3002 127.0.0.1 80
+
+! exec_cmd fwdctl delete -f file_doesnt_exists.yml
+
+-- rules.yml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3002
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp

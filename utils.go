@@ -75,7 +75,7 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 
 	ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
 	// check if command has '&' as last char to be ran in background
-	if backgroundSpecifier.MatchString(args[len(args)-1]) {
+	if len(args) > 0 && backgroundSpecifier.MatchString(args[len(args)-1]) {
 		_, err = execBackground(ts, customCommand[0], customCommand[1:len(args)-1]...)
 	} else {
 		err = ts.Exec(customCommand[0], customCommand[1:]...)

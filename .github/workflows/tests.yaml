@@ -64,37 +64,37 @@ jobs:
             -exec sudo \
             -cover \
             -v ./... \
-            -run TestFwdctl/apply \
+            -run TestFwdctl/apply$ \
             -args -test.gocoverdir=/tmp/integration/
           go test \
             -exec sudo \
             -cover \
             -v ./... \
-            -run TestFwdctl/create \
+            -run TestFwdctl/create$ \
             -args -test.gocoverdir=/tmp/integration/
           go test \
             -exec sudo \
             -cover \
             -v ./... \
-            -run TestFwdctl/delete \
+            -run TestFwdctl/delete$ \
             -args -test.gocoverdir=/tmp/integration/
           go test \
             -exec sudo \
             -cover \
             -v ./... \
-            -run TestFwdctl/list \
+            -run TestFwdctl/list$ \
             -args -test.gocoverdir=/tmp/integration/
           go test \
             -exec sudo \
             -cover \
             -v ./... \
-            -run TestFwdctl/daemon \
+            -run TestFwdctl/daemon$ \
             -args -test.gocoverdir=/tmp/integration/
           go test \
             -exec sudo \
             -cover \
             -v ./... \
-            -run TestFwdctl/version \
+            -run TestFwdctl/version$ \
             -args -test.gocoverdir=/tmp/integration/
 
       - name: Upload cover profiles
@@ -214,14 +214,30 @@ jobs:
 
       - name: Run integration test
         run: |
-          # we have to run integration tests one-by-one
-          # otherwhise they will run in parallel.
-          # since fwdctl apply network forwards, these could 
-          # interact with each other and make the test fail.
           go test \
             -exec sudo \
             -v ./... \
-            -run TestFwdctl/daemon_trace
+            -run TestFwdctl/apply_trace
+          go test \
+            -exec sudo \
+            -v ./... \
+            -run TestFwdctl/create_trace
+          go test \
+            -exec sudo \
+            -v ./... \
+            -run TestFwdctl/delete_trace
+          go test \
+            -exec sudo \
+            -v ./... \
+            -run TestFwdctl/generate_trace
+          go test \
+            -exec sudo \
+            -v ./... \
+            -run TestFwdctl/list_trace
+          go test \
+            -exec sudo \
+            -v ./... \
+            -run TestFwdctl/version_trace
         shell: bash
 
       - name: Upload cover profiles
