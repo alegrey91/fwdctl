@@ -210,7 +210,6 @@ jobs:
 
       - name: Run integration test
         run: |
-          mkdir /tmp/integration
           # we have to run integration tests one-by-one
           # otherwhise they will run in parallel.
           # since fwdctl apply network forwards, these could 
@@ -218,14 +217,14 @@ jobs:
           go test \
             -exec sudo \
             -v ./... \
-            -run TestFwdctl/daemon_trace \
-            -- -tracing
+            -run TestFwdctl/daemon_trace -- -tracing
 
       - name: Upload cover profiles
         uses: actions/upload-artifact@v3
         with:
           name: integration-test-syscalls
           path: integration-test-syscalls
+
   build-seccomp-profile:
 
     runs-on: ubuntu-latest
