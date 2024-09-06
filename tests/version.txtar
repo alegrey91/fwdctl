@@ -11,4 +11,4 @@ stdout 'dev'
 
 # use an invalid argument
 ! exec fwdctl version -x
-stderr "unknown shorthand flag: 'x' in -x"
+stdout "unknown shorthand flag: 'x' in -x"
