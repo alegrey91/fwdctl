@@ -18,10 +18,10 @@ stdout 'Usage:'
 exec_cmd fwdctl daemon stop --help
 stdout 'Usage:'
 
-! exec_cmd fwdctl daemon start --file file_doesnt_exists.yml
+exec_cmd fwdctl daemon start --file file_doesnt_exists.yml
 
 # should apply the rules from default file
-! exec_cmd fwdctl daemon start &
+exec_cmd fwdctl daemon start &
 exec sleep 5
 fwd_exists lo tcp 3000 127.0.0.1 80
 fwd_exists lo tcp 3001 127.0.0.1 80
