@@ -215,9 +215,10 @@ jobs:
           # since fwdctl apply network forwards, these could 
           # interact with each other and make the test fail.
           go test \
+            -tracing \
             -exec sudo \
             -v ./... \
-            -run TestFwdctl/daemon_trace -- -tracing
+            -run TestFwdctl/daemon_trace
         shell: bash
 
       - name: Upload cover profiles
