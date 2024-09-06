@@ -8,6 +8,7 @@ import (
 
 func TestFwdctl(t *testing.T) {
 	testscript.Run(t, testscript.Params{
+		TestWork:            true,
 		Dir:                 "tests",
 		Cmds:                customCommands(),
 		RequireExplicitExec: true,

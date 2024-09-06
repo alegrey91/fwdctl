@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -49,7 +50,7 @@ func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
 //nolint:all
 func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	var backgroundSpecifier = regexp.MustCompile(`^&([a-zA-Z_0-9]+&)?$`)
-	//uuid := getRandomString()
+	uuid := getRandomString()
 	customCommand := []string{
 		"/usr/local/bin/harpoon",
 		"capture",
@@ -60,8 +61,8 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 		"integration-test-syscalls",
 		"--include-cmd-stdout",
 		"--include-cmd-stderr",
-		//"--name",
-		//fmt.Sprintf("main_main_%s", uuid),
+		"--name",
+		fmt.Sprintf("main_main_%s", uuid),
 		"--",
 	}
 
