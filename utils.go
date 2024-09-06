@@ -47,40 +47,30 @@ func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
 
 //nolint:all
 func execCmd(ts *testscript.TestScript, neg bool, args []string) {
-	tracing := ts.Getenv("TRACING")
-	var err error
 	var backgroundSpecifier = regexp.MustCompile(`^&([a-zA-Z_0-9]+&)?$`)
-	if tracing != "true" {
-		ts.Logf("executing command: %s", strings.Join(args, " "))
-		if backgroundSpecifier.MatchString(args[len(args)-1]) {
-			execBackground(args[0], args[1:]...)
-			return
-		}
-		err = ts.Exec(args[0], args[1:]...)
-	} else {
-		//uuid := getRandomString()
-		customCommand := []string{
-			"/usr/local/bin/harpoon",
-			"capture",
-			"-f",
-			"main.main",
-			"--save",
-			"--directory",
-			"integration-test-syscalls",
-			"--include-cmd-stdout",
-			"--include-cmd-stderr",
-			//"--name",
-			//fmt.Sprintf("main_main_%s", uuid),
-			"--",
-		}
-		customCommand = append(customCommand, args...)
-		ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
-		if backgroundSpecifier.MatchString(args[len(args)-1]) {
-			execBackground(args[0], args[1:]...)
-			return
-		}
-		err = ts.Exec(customCommand[0], customCommand[1:]...)
+	//uuid := getRandomString()
+	customCommand := []string{
+		"/usr/local/bin/harpoon",
+		"capture",
+		"-f",
+		"main.main",
+		"--save",
+		"--directory",
+		"integration-test-syscalls",
+		"--include-cmd-stdout",
+		"--include-cmd-stderr",
+		//"--name",
+		//fmt.Sprintf("main_main_%s", uuid),
+		"--",
 	}
+	customCommand = append(customCommand, args...)
+	ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
+	if backgroundSpecifier.MatchString(args[len(args)-1]) {
+		execBackground(args[0], args[1:]...)
+		return
+	}
+	err := ts.Exec(customCommand[0], customCommand[1:]...)
+
 	if err != nil {
 		if neg {
 			ts.Logf("expected error: %v", err)
