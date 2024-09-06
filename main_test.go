@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"os"
 	"testing"
 
 	"github.com/rogpeppe/go-internal/testscript"
@@ -10,6 +11,7 @@ import (
 var tracing *bool
 
 func init() {
+	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	tracing = flag.Bool("tracing", false, "Trace syscalls during tests")
 }
 
