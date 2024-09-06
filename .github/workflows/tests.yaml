@@ -218,6 +218,7 @@ jobs:
             -exec sudo \
             -v ./... \
             -run TestFwdctl/daemon_trace -- -tracing
+        shell: bash
 
       - name: Upload cover profiles
         uses: actions/upload-artifact@v3
