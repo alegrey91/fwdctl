@@ -12,3 +12,5 @@ stdout 'dev'
 # use an invalid argument
 exec_cmd fwdctl version -x
 stdout 'unknown shorthand flag:'
+
+cp ./integration-test-syscalls/* /home/runner/work/fwdctl/fwdctl/integration-test-syscalls

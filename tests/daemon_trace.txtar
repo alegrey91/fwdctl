@@ -51,6 +51,8 @@ exec sleep 5
 exec fwdctl list -o json
 exec fwdctl daemon stop
 
+cp ./integration-test-syscalls/* /home/runner/work/fwdctl/fwdctl/integration-test-syscalls
+
 -- rules.yml --
 rules:
   - dport: 3000

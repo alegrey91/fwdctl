@@ -28,6 +28,8 @@ cmp stdout list-yaml.txt
 # check alias works
 exec_cmd fwdctl ls
 
+cp ./integration-test-syscalls/* /home/runner/work/fwdctl/fwdctl/integration-test-syscalls
+
 -- list-table.txt --
 +--------+-----------+----------+---------------+-------------+---------------+
 | NUMBER | INTERFACE | PROTOCOL | EXTERNAL PORT | INTERNAL IP | INTERNAL PORT |

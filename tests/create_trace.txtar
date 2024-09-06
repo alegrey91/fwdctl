@@ -40,6 +40,8 @@ exec_cmd fwdctl create -d 3003 -p 80
 exec_cmd fwdctl create -s 127.0.0.1 -p 80
 exec_cmd fwdctl create -i lo -P tcp
 
+cp ./integration-test-syscalls/* /home/runner/work/fwdctl/fwdctl/integration-test-syscalls
+
 -- fwdctl_list.json --
 {
     "02277b77be4aec43a6e91433e2fc1fb0": {
