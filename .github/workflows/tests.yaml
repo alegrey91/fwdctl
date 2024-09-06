@@ -214,6 +214,7 @@ jobs:
 
       - name: Run integration test
         run: |
+          mkdir -p integration-test-syscalls
           go test \
             -exec sudo \
             -v ./... \
@@ -242,6 +243,7 @@ jobs:
 
       - name: check directory
         run: |
+          pwd
           ls -laR
 
       - name: Upload cover profiles
