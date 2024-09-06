@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -75,7 +76,7 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
 	// check if command has '&' as last char to be ran in background
 	if backgroundSpecifier.MatchString(args[len(args)-1]) {
-		_, err = execBackground(customCommand[0], customCommand[1:len(args)-1]...)
+		_, err = execBackground(ts, customCommand[0], customCommand[1:len(args)-1]...)
 	} else {
 		err = ts.Exec(customCommand[0], customCommand[1:]...)
 	}
@@ -91,9 +92,14 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	}
 }
 
-func execBackground(command string, args ...string) (*exec.Cmd, error) {
+func execBackground(ts *testscript.TestScript, command string, args ...string) (*exec.Cmd, error) {
 	cmd := exec.Command(command, args...)
+	path := ts.MkAbs(".")
+	dir, _ := filepath.Split(path)
+
 	var stdoutBuf, stderrBuf strings.Builder
+	cmd.Dir = dir
+	cmd.Env = append(cmd.Env, "PWD="+dir)
 	cmd.Stdout = &stdoutBuf
 	cmd.Stderr = &stderrBuf
 	return cmd, cmd.Start()
