@@ -38,8 +38,8 @@ var generateSystemdCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("cannot create systemd service: %v", err)
 		}
-		
-		if err = template.GenerateTemplate(systemd, outputFile);err != nil {
+
+		if err = template.GenerateTemplate(systemd, outputFile); err != nil {
 			return fmt.Errorf("generating templated file: %v", err)
 		}
 		return nil
@@ -52,4 +52,7 @@ func init() {
 	generateSystemdCmd.Flags().StringVarP(&installationPath, "installation-path", "p", "/usr/local/bin", "fwdctl installation path")
 	generateSystemdCmd.Flags().StringVarP(&c.RulesFile, "file", "f", "rules.yml", "rules file path")
 	generateSystemdCmd.Flags().StringVarP(&serviceType, "type", "t", "oneshot", "systemd service type [oneshot, fork]")
+
+	generateSystemdCmd.PersistentFlags().StringVarP(&outputFile, "output-path", "O", "", "output path")
+	_ = generateSystemdCmd.MarkPersistentFlagRequired("output-path")
 }
