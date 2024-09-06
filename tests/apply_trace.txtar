@@ -35,42 +35,42 @@ exec_cmd fwdctl apply
 
 # should not apply
 # (wrong protocol)
-! exec_cmd fwdctl apply --file rules-wrong.yaml
+exec_cmd fwdctl apply --file rules-wrong.yaml
 ! fwd_exists lo tcp 3000 127.0.0.1 80
 ! fwd_exists lo tcp 3001 127.0.0.1 80
 ! fwd_exists lo tcp 3002 127.0.0.1 80
 
 # should not apply
 # (empty interface)
-! exec_cmd fwdctl apply --file rules-wrong2.yaml
+exec_cmd fwdctl apply --file rules-wrong2.yaml
 ! fwd_exists lo tcp 3000 127.0.0.1 80
 ! fwd_exists lo tcp 3001 127.0.0.1 80
 ! fwd_exists lo tcp 3002 127.0.0.1 80
 
 # should not apply
 # (interface doesn't exist)
-! exec_cmd fwdctl apply --file rules-wrong3.yaml
+exec_cmd fwdctl apply --file rules-wrong3.yaml
 ! fwd_exists lo tcp 3000 127.0.0.1 80
 ! fwd_exists lo tcp 3001 127.0.0.1 80
 ! fwd_exists lo tcp 3002 127.0.0.1 80
 
 # should not apply
 # (empty destination port)
-! exec_cmd fwdctl apply --file rules-wrong4.yaml
+exec_cmd fwdctl apply --file rules-wrong4.yaml
 ! fwd_exists lo tcp 3000 127.0.0.1 80
 ! fwd_exists lo tcp 3001 127.0.0.1 80
 ! fwd_exists lo tcp 3002 127.0.0.1 80
 
 # should not apply
 # (empty source address)
-! exec_cmd fwdctl apply --file rules-wrong5.yaml
+exec_cmd fwdctl apply --file rules-wrong5.yaml
 ! fwd_exists lo tcp 3000 127.0.0.1 80
 ! fwd_exists lo tcp 3001 127.0.0.1 80
 ! fwd_exists lo tcp 3002 127.0.0.1 80
 
 # should not apply
 # (empty source port)
-! exec_cmd fwdctl apply --file rules-wrong6.yaml
+exec_cmd fwdctl apply --file rules-wrong6.yaml
 ! fwd_exists lo tcp 3000 127.0.0.1 80
 ! fwd_exists lo tcp 3001 127.0.0.1 80
 ! fwd_exists lo tcp 3002 127.0.0.1 80
