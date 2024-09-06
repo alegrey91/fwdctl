@@ -23,9 +23,6 @@ func TestFwdctl(t *testing.T) {
 		RequireExplicitExec: true,
 		Setup: func(env *testscript.Env) error {
 			env.Setenv("GOCOVERDIR", "/tmp/integration")
-			if *tracing {
-				env.Setenv("TRACING", "true")
-			}
 			return nil
 		},
 	})

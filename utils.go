@@ -63,29 +63,39 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 		//fmt.Sprintf("main_main_%s", uuid),
 		"--",
 	}
-	customCommand = append(customCommand, args...)
-	ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
-	if backgroundSpecifier.MatchString(args[len(args)-1]) {
-		execBackground(customCommand[0], customCommand[1:]...)
-		return
-	}
-	err := ts.Exec(customCommand[0], customCommand[1:]...)
 
+	// find binary path for primary command
+	cmdPath, err := exec.LookPath(args[0])
 	if err != nil {
-		if neg {
-			ts.Logf("expected error: %v", err)
-			return
+		args[0] = cmdPath
+	}
+	customCommand = append(customCommand, args...)
+
+	ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
+	// check if command has '&' as last char to be ran in background
+	if backgroundSpecifier.MatchString(args[len(args)-1]) {
+		_, err = execBackground(customCommand[0], customCommand[1:len(args)-1]...)
+	} else {
+		err = ts.Exec(customCommand[0], customCommand[1:]...)
+	}
+	if err != nil {
+		ts.Logf("[%v]\n", err)
+		if !neg {
+			ts.Fatalf("unexpected go command failure")
 		}
-		ts.Fatalf("error: %v", err)
+	} else {
+		if neg {
+			ts.Fatalf("unexpected go command success")
+		}
 	}
 }
 
-func execBackground(command string, args ...string) {
+func execBackground(command string, args ...string) (*exec.Cmd, error) {
 	cmd := exec.Command(command, args...)
 	var stdoutBuf, stderrBuf strings.Builder
 	cmd.Stdout = &stdoutBuf
 	cmd.Stderr = &stderrBuf
-	cmd.Start()
+	return cmd, cmd.Start()
 }
 
 //nolint:all
