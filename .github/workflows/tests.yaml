@@ -208,6 +208,10 @@ jobs:
         run: |
           make build && sudo make -B install
 
+      - name: Install harpoon
+        run: |
+          curl -s https://raw.githubusercontent.com/alegrey91/harpoon/main/install | sudo sh
+
       - name: Run integration test
         run: |
           # we have to run integration tests one-by-one
