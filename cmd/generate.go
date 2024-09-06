@@ -16,6 +16,8 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -29,6 +31,7 @@ var generateCmd = &cobra.Command{
 	Long: `generates templated file for fwdtcl
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		fmt.Println(cmd.Help())
 		return nil
 	},
 }
