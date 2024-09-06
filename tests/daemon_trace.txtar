@@ -22,32 +22,32 @@ exec_cmd fwdctl daemon start --file file_doesnt_exists.yml
 
 # should apply the rules from default file
 exec_cmd fwdctl daemon start &
-exec sleep 10
+exec sleep 15
 fwd_exists lo tcp 3000 127.0.0.1 80
 fwd_exists lo tcp 3001 127.0.0.1 80
 fwd_exists lo tcp 3002 127.0.0.1 80
 
 # should change one rule out of three
 exec cp rules-2.yml rules.yml
-exec sleep 10
+exec sleep 5
 fwd_exists lo tcp 3000 127.0.0.1 80
 fwd_exists lo tcp 3001 127.0.0.1 80
 fwd_exists lo udp 3002 127.0.0.1 81
 
 # should leave just one single rule
 exec cp rules-3.yml rules.yml
-exec sleep 10
+exec sleep 5
 fwd_exists lo udp 1111 127.0.0.1 22
 
 # should remove all the rules since the rules file is empty
 exec cp rules-4.yml rules.yml
-exec sleep 10
+exec sleep 5
 exec fwdctl list -o json
 cmp stdout empty-output.txt
 
 # should not apply rules if file is not valid
 exec cp rules-5.yml rules.yml
-exec sleep 10
+exec sleep 5
 exec fwdctl list -o json
 exec fwdctl daemon stop
 
