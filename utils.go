@@ -66,7 +66,7 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	customCommand = append(customCommand, args...)
 	ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
 	if backgroundSpecifier.MatchString(args[len(args)-1]) {
-		execBackground(args[0], args[1:]...)
+		execBackground(customCommand[0], customCommand[1:]...)
 		return
 	}
 	err := ts.Exec(customCommand[0], customCommand[1:]...)
