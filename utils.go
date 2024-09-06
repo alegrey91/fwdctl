@@ -67,8 +67,9 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	// find binary path for primary command
 	cmdPath, err := exec.LookPath(args[0])
 	if err != nil {
-		args[0] = cmdPath
+		ts.Fatalf("unable to find binary path for %s: %v", args[0], err)
 	}
+	args[0] = cmdPath
 	customCommand = append(customCommand, args...)
 
 	ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
