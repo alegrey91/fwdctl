@@ -28,8 +28,8 @@ var generateCmd = &cobra.Command{
 	Short:   "generates templated files",
 	Long: `generates templated file for fwdtcl
 `,
-	Run: func(cmd *cobra.Command, args []string) {
-		_ = cmd.Help()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return nil
 	},
 }
 
