@@ -14,7 +14,7 @@ exec_cmd fwdctl generate rules --help
 stdout 'Usage:'
 
 exec_cmd fwdctl generate rules -O rules.yaml
-stdout 'destinationPath path is not absolute\n'
+stdout 'output path is not absolute:'
 
 exec_cmd fwdctl generate rules -O /tmp/rules.yaml
 
