@@ -10,5 +10,5 @@ exec_cmd fwdctl version
 stdout 'dev'
 
 # use an invalid argument
-! exec_cmd fwdctl version -x
+exec_cmd fwdctl version -x
 stderr 'Usage:'

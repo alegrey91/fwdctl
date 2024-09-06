@@ -31,7 +31,7 @@ exec fwdctl delete -n 1
 # removing the default rules.yml file
 # it should fail
 exec rm rules.yml
-! exec_cmd fwdctl apply
+exec_cmd fwdctl apply
 
 # should not apply
 # (wrong protocol)

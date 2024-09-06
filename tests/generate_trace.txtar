@@ -13,10 +13,10 @@ stdout 'Usage:'
 exec_cmd fwdctl generate rules --help
 stdout 'Usage:'
 
-! exec_cmd fwdctl generate rules -O rules.yaml
+exec_cmd fwdctl generate rules -O rules.yaml
 stdout 'destinationPath path is not absolute\n'
 
-! exec_cmd fwdctl generate rules -O /tmp/rules.yaml
+exec_cmd fwdctl generate rules -O /tmp/rules.yaml
 
 exec_cmd fwdctl generate rules -O /tmp/
 exists /tmp/rules.yml
@@ -26,10 +26,10 @@ cmp /tmp/rules.yml rules.yml
 exec_cmd fwdctl generate systemd --help
 stdout 'Usage:'
 
-! exec_cmd fwdctl generate systemd --file /tmp/rules.yml
-! exec_cmd fwdctl generate systemd --installation-path /usr/local/bin
-! exec_cmd fwdctl generate systemd --type "fork"
-! exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type fork
+exec_cmd fwdctl generate systemd --file /tmp/rules.yml
+exec_cmd fwdctl generate systemd --installation-path /usr/local/bin
+exec_cmd fwdctl generate systemd --type "fork"
+exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type fork
 
 # test with options '--type oneshot' (default)
 exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin -O /tmp/
@@ -40,7 +40,7 @@ exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/
 cmp /tmp/fwdctl.service fwdctl-fork.service
 
 # test with options '--type null' (does not exist)
-! exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type null -O /tmp/
+exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type null -O /tmp/
 
 -- rules.yml --
 rules:

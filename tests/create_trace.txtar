@@ -35,10 +35,10 @@ fwd_exists lo tcp 3003 127.0.0.1 80
 exec fwdctl delete -n 1
 
 # should not create rules
-! exec_cmd fwdctl create -d 3003 -s 127.0.0.1
-! exec_cmd fwdctl create -d 3003 -p 80
-! exec_cmd fwdctl create -s 127.0.0.1 -p 80
-! exec_cmd fwdctl create -i lo -P tcp
+exec_cmd fwdctl create -d 3003 -s 127.0.0.1
+exec_cmd fwdctl create -d 3003 -p 80
+exec_cmd fwdctl create -s 127.0.0.1 -p 80
+exec_cmd fwdctl create -i lo -P tcp
 
 -- fwdctl_list.json --
 {

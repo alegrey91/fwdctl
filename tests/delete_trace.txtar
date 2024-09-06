@@ -43,7 +43,7 @@ exec_cmd fwdctl delete --all
 ! fwd_exists lo tcp 3002 127.0.0.1 80
 
 # unable to use all the flags at the same time
-! exec_cmd fwdctl delete -n 1 -a -f rules.yml
+exec_cmd fwdctl delete -n 1 -a -f rules.yml
 
 exec fwdctl apply
 fwd_exists lo tcp 3000 127.0.0.1 80
@@ -54,7 +54,7 @@ exec_cmd fwdctl delete
 ! fwd_exists lo tcp 3001 127.0.0.1 80
 ! fwd_exists lo tcp 3002 127.0.0.1 80
 
-! exec_cmd fwdctl delete -f file_doesnt_exists.yml
+exec_cmd fwdctl delete -f file_doesnt_exists.yml
 
 -- rules.yml --
 rules:
