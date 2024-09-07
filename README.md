@@ -41,3 +41,12 @@ Full **documentation** [here](docs/getting-started.md).
 curl -s https://raw.githubusercontent.com/alegrey91/fwdctl/main/install | sudo sh
 ```
 
+## Seccomp (experimental)
+
+I've recently added a new functionality to trace the system calls used by `fwdctl` during the test pipeline.
+
+This is done by using another project of mine: [`harpoon`](https://github.com/alegrey91/harpoon).
+
+Thanks to this, at the end of the pipeline, we have a **seccomp** profile as artifact. You can use this to run `fwdctl` in a more secure way.
+
+Find the **seccomp** profile at the end of the last `test` pipeline.
