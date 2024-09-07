@@ -242,11 +242,6 @@ jobs:
             -run TestFwdctl/version_trace
         shell: bash
 
-      - name: check directory
-        run: |
-          pwd
-          ls -laR
-
       - name: Upload cover profiles
         uses: actions/upload-artifact@v3
         with:
