@@ -4,6 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"io/fs"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -91,6 +93,44 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 			ts.Fatalf("unexpected go command success")
 		}
 	}
+	if err := moveArtifacts("integration-test-syscalls", "/home/runner/work/fwdctl/fwdctl/integration-test-syscalls"); err != nil {
+		ts.Fatalf(err.Error())
+	}
+}
+
+func moveArtifacts(src, dst string) error {
+	entries, err := os.ReadDir(src)
+	if err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(dst, 0755); err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		srcPath := filepath.Join(src, entry.Name())
+		dstPath := filepath.Join(dst, entry.Name())
+
+		if entry.IsDir() {
+			err = moveArtifacts(srcPath, dstPath)
+			if err != nil {
+				return err
+			}
+		} else {
+			data, err := os.ReadFile(srcPath)
+			if err != nil {
+				return err
+			}
+
+			err = os.WriteFile(dstPath, data, fs.ModeAppend)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func execBackground(ts *testscript.TestScript, command string, args ...string) (*exec.Cmd, error) {
