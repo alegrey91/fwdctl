@@ -51,7 +51,7 @@ func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
 func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	var backgroundSpecifier = regexp.MustCompile(`^&([a-zA-Z_0-9]+&)?$`)
 	uuid := getRandomString()
-	workDir := ts.Getenv("WORK")
+	workDir := ts.Value("WORK")
 	customCommand := []string{
 		"/usr/local/bin/harpoon",
 		"capture",
