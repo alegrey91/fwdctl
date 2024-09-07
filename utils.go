@@ -58,7 +58,7 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 		"main.main",
 		"--save",
 		"--directory",
-		"integration-test-syscalls",
+		"/home/runner/work/fwdctl/fwdctl/integration-test-syscalls",
 		"--include-cmd-stdout",
 		"--include-cmd-stderr",
 		"--name",
