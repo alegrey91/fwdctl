@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -51,7 +52,10 @@ func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
 func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	var backgroundSpecifier = regexp.MustCompile(`^&([a-zA-Z_0-9]+&)?$`)
 	uuid := getRandomString()
-	workDir := ts.Value("WORK")
+	workDir, err := os.Getwd()
+	if err != nil {
+		ts.Fatalf("unable to find work dir: %v", err)
+	}
 	customCommand := []string{
 		"/usr/local/bin/harpoon",
 		"capture",
