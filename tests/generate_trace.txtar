@@ -3,44 +3,44 @@
 # if go is not installed, then skip
 [!exec:go] skip
 
-exec fwdctl generate
+exec_cmd fwdctl generate
 stdout 'Usage:'
 
-exec fwdctl generate --help
+exec_cmd fwdctl generate --help
 stdout 'Usage:'
 
 # test 'generate rules' command
-exec fwdctl generate rules --help
+exec_cmd fwdctl generate rules --help
 stdout 'Usage:'
 
-! exec fwdctl generate rules -O rules.yaml
+exec_cmd fwdctl generate rules -O rules.yaml
 stdout 'output path is not absolute:'
 
-! exec fwdctl generate rules -O /tmp/rules.yaml
+exec_cmd fwdctl generate rules -O /tmp/rules.yaml
 
-exec fwdctl generate rules -O /tmp/
+exec_cmd fwdctl generate rules -O /tmp/
 exists /tmp/rules.yml
 cmp /tmp/rules.yml rules.yml
 
 # test 'generate systemd' command
-exec fwdctl generate systemd --help
+exec_cmd fwdctl generate systemd --help
 stdout 'Usage:'
 
-! exec fwdctl generate systemd --file /tmp/rules.yml
-! exec fwdctl generate systemd --installation-path /usr/local/bin
-! exec fwdctl generate systemd --type "fork"
-! exec fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type fork
+exec_cmd fwdctl generate systemd --file /tmp/rules.yml
+exec_cmd fwdctl generate systemd --installation-path /usr/local/bin
+exec_cmd fwdctl generate systemd --type "fork"
+exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type fork
 
 # test with options '--type oneshot' (default)
-exec fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin -O /tmp/
+exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin -O /tmp/
 cmp /tmp/fwdctl.service fwdctl-oneshot.service
 
 # test with options '--type fork'
-exec fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type fork -O /tmp/
+exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type fork -O /tmp/
 cmp /tmp/fwdctl.service fwdctl-fork.service
 
 # test with options '--type null' (does not exist)
-! exec fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type null -O /tmp/
+exec_cmd fwdctl generate systemd --file /tmp/rules.yml --installation-path /usr/local/bin --type null -O /tmp/
 
 -- rules.yml --
 rules:

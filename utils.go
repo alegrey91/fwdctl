@@ -3,6 +3,11 @@ package main
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/alegrey91/fwdctl/pkg/iptables"
@@ -45,37 +50,65 @@ func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
 
 //nolint:all
 func execCmd(ts *testscript.TestScript, neg bool, args []string) {
-	tracing := ts.Getenv("TRACING")
-	var err error
-	if tracing != "true" {
-		ts.Logf("executing command: %s", strings.Join(args, " "))
-		err = ts.Exec(args[0], args[1:]...)
+	var backgroundSpecifier = regexp.MustCompile(`^&([a-zA-Z_0-9]+&)?$`)
+	uuid := getRandomString()
+	workDir, err := os.Getwd()
+	if err != nil {
+		ts.Fatalf("unable to find work dir: %v", err)
+	}
+	customCommand := []string{
+		"/usr/local/bin/harpoon",
+		"capture",
+		"-f",
+		"main.main",
+		"--save",
+		"--directory",
+		fmt.Sprintf("%s/integration-test-syscalls", workDir),
+		"--include-cmd-stdout",
+		"--include-cmd-stderr",
+		"--name",
+		fmt.Sprintf("main_main_%s", uuid),
+		"--",
+	}
+
+	// find binary path for primary command
+	cmdPath, err := exec.LookPath(args[0])
+	if err != nil {
+		ts.Fatalf("unable to find binary path for %s: %v", args[0], err)
+	}
+	args[0] = cmdPath
+	customCommand = append(customCommand, args...)
+
+	ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
+	// check if command has '&' as last char to be ran in background
+	if len(args) > 0 && backgroundSpecifier.MatchString(args[len(args)-1]) {
+		_, err = execBackground(ts, customCommand[0], customCommand[1:len(args)-1]...)
 	} else {
-		//uuid := getRandomString()
-		customCommand := []string{
-			"/usr/local/bin/harpoon",
-			"capture",
-			"-f",
-			"main.main",
-			"--save",
-			"--directory",
-			"integration-test-syscalls",
-			"--include-cmd-output",
-			//"--name",
-			//fmt.Sprintf("main_main_%s", uuid),
-			"--",
-		}
-		customCommand = append(customCommand, args...)
-		ts.Logf("executing tracing command: %s", strings.Join(customCommand, " "))
 		err = ts.Exec(customCommand[0], customCommand[1:]...)
 	}
 	if err != nil {
-		if neg {
-			ts.Logf("expected error: %v", err)
-			return
+		ts.Logf("[%v]\n", err)
+		if !neg {
+			ts.Fatalf("unexpected go command failure")
 		}
-		ts.Fatalf("error: %v", err)
+	} else {
+		if neg {
+			ts.Fatalf("unexpected go command success")
+		}
 	}
+}
+
+func execBackground(ts *testscript.TestScript, command string, args ...string) (*exec.Cmd, error) {
+	cmd := exec.Command(command, args...)
+	path := ts.MkAbs(".")
+	dir, _ := filepath.Split(path)
+
+	var stdoutBuf, stderrBuf strings.Builder
+	cmd.Dir = dir
+	cmd.Env = append(cmd.Env, "PWD="+dir)
+	cmd.Stdout = &stdoutBuf
+	cmd.Stderr = &stderrBuf
+	return cmd, cmd.Start()
 }
 
 //nolint:all

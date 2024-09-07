@@ -3,12 +3,12 @@
 # if go is not installed, then skip
 [!exec:go] skip
 
-exec fwdctl version --help
+exec_cmd fwdctl version --help
 stdout 'Usage:'
 
-exec fwdctl version
+exec_cmd fwdctl version
 stdout 'dev'
 
 # use an invalid argument
-! exec fwdctl version -x
+exec_cmd fwdctl version -x
 stdout 'unknown shorthand flag:'

@@ -41,4 +41,7 @@ var generateRulesCmd = &cobra.Command{
 
 func init() {
 	generateCmd.AddCommand(generateRulesCmd)
+
+	generateRulesCmd.PersistentFlags().StringVarP(&outputFile, "output-path", "O", "", "output path")
+	_ = generateRulesCmd.MarkPersistentFlagRequired("output-path")
 }

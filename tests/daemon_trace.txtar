@@ -1,0 +1,115 @@
+# this testscript test the 'daemon' command
+
+# if go is not installed, then skip
+[!exec:go] skip
+
+exec_cmd fwdctl daemon
+stdout 'Usage:'
+
+# remove all previously applied forwards
+exec_cmd fwdctl delete --all
+
+exec_cmd fwdctl daemon --help
+stdout 'Usage:'
+
+exec_cmd fwdctl daemon start --help
+stdout 'Usage:'
+
+exec_cmd fwdctl daemon stop --help
+stdout 'Usage:'
+
+exec_cmd fwdctl daemon start --file file_doesnt_exists.yml
+
+# should apply the rules from default file
+exec_cmd fwdctl daemon start &
+exec sleep 15
+fwd_exists lo tcp 3000 127.0.0.1 80
+fwd_exists lo tcp 3001 127.0.0.1 80
+fwd_exists lo tcp 3002 127.0.0.1 80
+
+# should change one rule out of three
+exec cp rules-2.yml rules.yml
+exec sleep 5
+fwd_exists lo tcp 3000 127.0.0.1 80
+fwd_exists lo tcp 3001 127.0.0.1 80
+fwd_exists lo udp 3002 127.0.0.1 81
+
+# should leave just one single rule
+exec cp rules-3.yml rules.yml
+exec sleep 5
+fwd_exists lo udp 1111 127.0.0.1 22
+
+# should remove all the rules since the rules file is empty
+exec cp rules-4.yml rules.yml
+exec sleep 5
+exec fwdctl list -o json
+cmp stdout empty-output.txt
+
+# should not apply rules if file is not valid
+exec cp rules-5.yml rules.yml
+exec sleep 5
+exec fwdctl list -o json
+exec fwdctl daemon stop
+
+-- rules.yml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3002
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+
+-- rules-2.yml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3002
+    saddr: 127.0.0.1
+    sport: 81
+    iface: lo
+    proto: udp
+
+-- rules-3.yml --
+rules:
+  - dport: 1111
+    saddr: 127.0.0.1
+    sport: 22
+    iface: lo
+    proto: udp
+
+-- rules-4.yml --
+rules:
+
+-- rules-5.yml --
+rules:
+  - dport: 
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+
+-- empty-output.txt --
+{}
