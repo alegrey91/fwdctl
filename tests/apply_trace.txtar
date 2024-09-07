@@ -75,9 +75,6 @@ exec_cmd fwdctl apply --file rules-wrong6.yaml
 ! fwd_exists lo tcp 3001 127.0.0.1 80
 ! fwd_exists lo tcp 3002 127.0.0.1 80
 
-exec ls -lsa integration-test-syscalls/
-cp_dir integration-test-syscalls/ /home/runner/work/fwdctl/fwdctl/integration-test-syscalls
-
 -- rules.yml --
 rules:
   - dport: 3000

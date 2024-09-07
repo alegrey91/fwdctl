@@ -4,8 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"io/fs"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -95,42 +93,6 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	}
 }
 
-func cpDir(ts *testscript.TestScript, neg bool, args []string) {
-	if len(args) != 2 {
-		ts.Fatalf("bad arguments number")
-	}
-	src := args[0]
-	dst := args[1]
-	entries, err := os.ReadDir(src)
-	if err != nil {
-		ts.Fatalf("%v", err)
-	}
-
-	if err := os.MkdirAll(dst, 0755); err != nil {
-		ts.Fatalf("%v", err)
-	}
-
-	for _, entry := range entries {
-		srcPath := filepath.Join(src, entry.Name())
-		dstPath := filepath.Join(dst, entry.Name())
-
-		recursionArgs := []string{src, dst}
-		if entry.IsDir() {
-			cpDir(ts, neg, recursionArgs)
-		} else {
-			data, err := os.ReadFile(srcPath)
-			if err != nil {
-				ts.Fatalf("%v", err)
-			}
-
-			err = os.WriteFile(dstPath, data, fs.ModeAppend)
-			if err != nil {
-				ts.Fatalf("%v", err)
-			}
-		}
-	}
-}
-
 func execBackground(ts *testscript.TestScript, command string, args ...string) (*exec.Cmd, error) {
 	cmd := exec.Command(command, args...)
 	path := ts.MkAbs(".")
@@ -162,6 +124,5 @@ func customCommands() map[string]func(ts *testscript.TestScript, neg bool, args 
 		// invoke as "fwd_exists iface proto dest_port src_addr src_port"
 		"fwd_exists": fwdExists,
 		"exec_cmd":   execCmd,
-		"cp_dir":     cpDir,
 	}
 }
