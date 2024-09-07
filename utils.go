@@ -51,6 +51,7 @@ func fwdExists(ts *testscript.TestScript, neg bool, args []string) {
 func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 	var backgroundSpecifier = regexp.MustCompile(`^&([a-zA-Z_0-9]+&)?$`)
 	uuid := getRandomString()
+	workDir := ts.Getenv("WORK")
 	customCommand := []string{
 		"/usr/local/bin/harpoon",
 		"capture",
@@ -58,8 +59,7 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 		"main.main",
 		"--save",
 		"--directory",
-		// TODO: change it to a general one
-		"/home/runner/work/fwdctl/fwdctl/integration-test-syscalls",
+		fmt.Sprintf("%s/integration-test-syscalls", workDir),
 		"--include-cmd-stdout",
 		"--include-cmd-stderr",
 		"--name",
