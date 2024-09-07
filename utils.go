@@ -93,44 +93,42 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 			ts.Fatalf("unexpected go command success")
 		}
 	}
-	if err := moveArtifacts("integration-test-syscalls", "/home/runner/work/fwdctl/fwdctl/integration-test-syscalls"); err != nil {
-		ts.Fatalf(err.Error())
-	}
 }
 
-func moveArtifacts(src, dst string) error {
+func cpDir(ts *testscript.TestScript, neg bool, args []string) {
+	if len(args) != 2 {
+		ts.Fatalf("bad arguments number")
+	}
+	src := args[0]
+	dst := args[1]
 	entries, err := os.ReadDir(src)
 	if err != nil {
-		return err
+		ts.Fatalf("%v", err)
 	}
 
 	if err := os.MkdirAll(dst, 0755); err != nil {
-		return err
+		ts.Fatalf("%v", err)
 	}
 
 	for _, entry := range entries {
 		srcPath := filepath.Join(src, entry.Name())
 		dstPath := filepath.Join(dst, entry.Name())
 
+		recursionArgs := []string{src, dst}
 		if entry.IsDir() {
-			err = moveArtifacts(srcPath, dstPath)
-			if err != nil {
-				return err
-			}
+			cpDir(ts, neg, recursionArgs)
 		} else {
 			data, err := os.ReadFile(srcPath)
 			if err != nil {
-				return err
+				ts.Fatalf("%v", err)
 			}
 
 			err = os.WriteFile(dstPath, data, fs.ModeAppend)
 			if err != nil {
-				return err
+				ts.Fatalf("%v", err)
 			}
 		}
 	}
-
-	return nil
 }
 
 func execBackground(ts *testscript.TestScript, command string, args ...string) (*exec.Cmd, error) {
@@ -164,5 +162,6 @@ func customCommands() map[string]func(ts *testscript.TestScript, neg bool, args 
 		// invoke as "fwd_exists iface proto dest_port src_addr src_port"
 		"fwd_exists": fwdExists,
 		"exec_cmd":   execCmd,
+		"cp_dir":     cpDir,
 	}
 }
