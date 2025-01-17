@@ -30,8 +30,8 @@ import (
 // applyCmd represents the apply command
 var applyCmd = &cobra.Command{
 	Use:     "apply",
-	Short:   "apply rules from file",
-	Long:    `apply rules described in a configuration file`,
+	Short:   "Apply rules from file",
+	Long:    `Apply rules described in a configuration file`,
 	Example: c.ProgramName + " apply --file rule.yml",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		rulesContent, err := os.Open(c.RulesFile)

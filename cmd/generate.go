@@ -27,8 +27,8 @@ var outputFile string
 var generateCmd = &cobra.Command{
 	Use:     "generate",
 	Aliases: []string{"gen"},
-	Short:   "generates templated files",
-	Long: `generates templated file for fwdtcl
+	Short:   "Generates templated files",
+	Long: `Generates templated file for fwdtcl
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println(cmd.Help())

@@ -32,8 +32,8 @@ var (
 var listCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"ls"},
-	Short:   "list forwards",
-	Long:    `list forwards made with iptables`,
+	Short:   "List forwards",
+	Long:    `List forwards made with iptables`,
 	Example: c.ProgramName + "list -o table",
 	RunE: func(cmd *cobra.Command, args []string) error{
 		ipt, err := iptables.NewIPTablesInstance()

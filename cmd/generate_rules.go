@@ -27,8 +27,8 @@ import (
 // generateRulesCmd represents the generateRules command
 var generateRulesCmd = &cobra.Command{
 	Use:   "rules",
-	Short: "generates empty rules file",
-	Long: `generates empty rules file
+	Short: "Generates empty rules file",
+	Long: `Generates empty rules file
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		rules := rt.NewRules()

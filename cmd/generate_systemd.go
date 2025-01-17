@@ -30,8 +30,8 @@ var serviceType string
 // generateSystemdCmd represents the generateSystemd command
 var generateSystemdCmd = &cobra.Command{
 	Use:   "systemd",
-	Short: "generates systemd service file",
-	Long: `generates systemd service file to run fwdctl at boot
+	Short: "Generates systemd service file",
+	Long: `Generates systemd service file to run fwdctl at boot
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		systemd, err := st.NewSystemdService(serviceType, installationPath, c.RulesFile)
