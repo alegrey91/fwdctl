@@ -29,26 +29,26 @@ cmp stdout list-yaml.txt
 exec_cmd fwdctl ls
 
 -- list-table.txt --
-+--------+-----------+----------+---------------+-------------+---------------+
-| NUMBER | INTERFACE | PROTOCOL | EXTERNAL PORT | INTERNAL IP | INTERNAL PORT |
-+--------+-----------+----------+---------------+-------------+---------------+
-|      1 | lo        | tcp      |          3000 | 127.0.0.1   |            80 |
-+--------+-----------+----------+---------------+-------------+---------------+
+stdout: +--------+-----------+----------+---------------+-------------+---------------+
+stdout: | NUMBER | INTERFACE | PROTOCOL | EXTERNAL PORT | INTERNAL IP | INTERNAL PORT |
+stdout: +--------+-----------+----------+---------------+-------------+---------------+
+stdout: |      1 | lo        | tcp      |          3000 | 127.0.0.1   |            80 |
+stdout: +--------+-----------+----------+---------------+-------------+---------------+
 -- list-json.txt --
-{
-    "0be1c5f4141015ca6a8e873344da06e6": {
-        "iface": "lo",
-        "proto": "tcp",
-        "dport": 3000,
-        "saddr": "127.0.0.1",
-        "sport": 80
-    }
-}
+stdout: {
+stdout:     "0be1c5f4141015ca6a8e873344da06e6": {
+stdout:         "iface": "lo",
+stdout:         "proto": "tcp",
+stdout:         "dport": 3000,
+stdout:         "saddr": "127.0.0.1",
+stdout:         "sport": 80
+stdout:     }
+stdout: }
 -- list-yaml.txt --
-0be1c5f4141015ca6a8e873344da06e6:
-    iface: lo
-    proto: tcp
-    dport: 3000
-    saddr: 127.0.0.1
-    sport: 80
-
+stdout: 0be1c5f4141015ca6a8e873344da06e6:
+stdout:     iface: lo
+stdout:     proto: tcp
+stdout:     dport: 3000
+stdout:     saddr: 127.0.0.1
+stdout:     sport: 80
+stdout: 
