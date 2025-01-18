@@ -57,7 +57,7 @@ func execCmd(ts *testscript.TestScript, neg bool, args []string) {
 		ts.Fatalf("unable to find work dir: %v", err)
 	}
 	customCommand := []string{
-		"/usr/local/bin/harpoon",
+		"/usr/sbin/harpoon",
 		"capture",
 		"-f",
 		"main.main",
