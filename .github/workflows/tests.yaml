@@ -288,6 +288,7 @@ jobs:
       - name: Build Seccomp Profile
         run: |
           sudo harpoon build \
+            --add-syscall-sets=dynamic,docker \
             --directory harpoon/ \
             --save \
             --name fwdctl-seccomp.json
