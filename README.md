@@ -49,4 +49,4 @@ This is done by using another project of mine: [`harpoon`](https://github.com/al
 
 Thanks to this, at the end of the pipeline, we have a **seccomp** profile as artifact. You can use this to run `fwdctl` in a more secure way.
 
-Find the **seccomp** profile at the end of the last `test` pipeline.
+Find the **seccomp** profile here: [`fwdctl-seccomp.json`](hack/fwdctl-seccomp.json).
