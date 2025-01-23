@@ -277,7 +277,7 @@ jobs:
 
       - name: Install harpoon
         run: |
-          curl -s https://raw.githubusercontent.com/alegrey91/harpoon/main/install | sudo sh
+          curl -s https://raw.githubusercontent.com/alegrey91/harpoon/main/install | sudo bash -s -- --install-version v0.9.3
 
       - name: Create unique directory
         run: |
