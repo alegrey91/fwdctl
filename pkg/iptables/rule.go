@@ -13,6 +13,17 @@ type Rule struct {
 	Saddr   string `json:"saddr" yaml:"saddr"`
 	Sport   int    `json:"sport" yaml:"sport"`
 	Comment string `json:"comment,omitempty" yaml:"comment,omitempty"`
+	// Hooks are commands executed after a forward is created or deleted.
+	// They are not part of the rule's iptables representation nor its
+	// identity hash, so changing a hook never churns the underlying forward.
+	Hooks *Hooks `json:"hooks,omitempty" yaml:"hooks,omitempty"`
+}
+
+// Hooks holds optional commands run after the corresponding forward
+// lifecycle event. Each command is executed through "sh -c".
+type Hooks struct {
+	OnCreate string `json:"on-create,omitempty" yaml:"on-create,omitempty"`
+	OnDelete string `json:"on-delete,omitempty" yaml:"on-delete,omitempty"`
 }
 
 func NewRule(iface string, proto string, dport int, saddr string, sport int) *Rule {
