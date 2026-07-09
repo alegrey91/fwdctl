@@ -94,6 +94,12 @@ jobs:
             -exec sudo \
             -cover \
             -v ./... \
+            -run TestFwdctl/hooks$ \
+            -args -test.gocoverdir=/tmp/integration/
+          go test \
+            -exec sudo \
+            -cover \
+            -v ./... \
             -run TestFwdctl/version$ \
             -args -test.gocoverdir=/tmp/integration/
 
