@@ -30,6 +30,44 @@ sudo fwdctl apply --file rules.yml
 
 and apply all the rules listed in the file.
 
+#### Hooks
+
+Each rule can define optional **hooks**: commands executed after the
+corresponding forward is created or deleted. This is useful to run side
+effects such as notifying a service, updating DNS, or logging.
+
+```yaml
+rules:
+  - dport: 2022
+    saddr: 192.168.122.43
+    sport: 22
+    iface: eth1
+    proto: tcp
+    hooks:
+      on-create: "/path/to/on-create-script.sh --port 2022"
+      on-delete: "/path/to/on-delete-script.sh --port 2022"
+```
+
+Details:
+
+* A hook command is run through `sh -c`, so it can include arguments,
+  pipes and shell expansion.
+* The `on-create` hook runs **after** the forward is applied; the
+  `on-delete` hook runs **after** the forward is removed. A hook never
+  prevents the forward change itself.
+* By default, if a hook exits non-zero the program exits non-zero as well
+  (for `apply`/`delete`, on the first failing hook). Pass
+  `--continue-on-hook-fail` to log the failure and keep going instead.
+* Hooks are only available where the rules file provides context:
+  `fwdctl apply`, `fwdctl delete --file`, and the `daemon`. They are **not**
+  run by `fwdctl create`, `fwdctl delete --id`, or `fwdctl delete --all`,
+  since those paths have no access to a rule's hooks.
+* In `daemon` mode the `on-create` hook fires when a rule is applied at
+  startup or added via a config change, and the `on-delete` hook fires when
+  a rule is removed via a config change or during shutdown. Without
+  `--continue-on-hook-fail`, a failing hook makes the daemon tear down its
+  forwards and exit non-zero.
+
 ### Create
 
 The `create` command is used to create single rules manually. Let's see an example.
