@@ -1,0 +1,104 @@
+# this testscript tests rule hooks (on-create / on-delete)
+
+# if go is not installed, then skip
+[!exec:go] skip
+
+# the --continue-on-hook-fail flag is advertised
+exec fwdctl apply --help
+stdout 'continue-on-hook-fail'
+exec fwdctl delete --help
+stdout 'continue-on-hook-fail'
+
+# remove all previously applied forwards
+exec fwdctl delete --all
+
+# the on-create hook runs after the forward is applied
+exec fwdctl apply --file rules-hooks.yaml
+fwd_exists lo tcp 3000 127.0.0.1 80
+exists oncreate.flag
+grep 'created' oncreate.flag
+
+# the on-delete hook runs after the forward is removed
+exec fwdctl delete --file rules-hooks.yaml
+! fwd_exists lo tcp 3000 127.0.0.1 80
+exists ondelete.flag
+grep 'deleted' ondelete.flag
+
+# a rule without hooks is applied fine next to one that has hooks
+exec fwdctl delete --all
+exec fwdctl apply --file rules-mixed.yaml
+fwd_exists lo tcp 3000 127.0.0.1 80
+fwd_exists lo tcp 3001 127.0.0.1 80
+exec fwdctl delete --all
+
+# a failing on-create hook makes apply exit non-zero,
+# but the forward itself is still applied (hooks run after the action)
+exec fwdctl delete --all
+! exec fwdctl apply --file rules-badhook.yaml
+fwd_exists lo tcp 3005 127.0.0.1 80
+
+# --continue-on-hook-fail ignores the failing hook and exits zero,
+# while still applying the forward
+exec fwdctl delete --all
+exec fwdctl apply --file rules-badhook.yaml --continue-on-hook-fail
+fwd_exists lo tcp 3005 127.0.0.1 80
+exec fwdctl delete --all
+
+# a failing on-delete hook aborts delete non-zero by default,
+# but the forward is still removed (hooks run after the action)
+exec fwdctl apply --file rules-badhook-del.yaml
+fwd_exists lo tcp 3006 127.0.0.1 80
+! exec fwdctl delete --file rules-badhook-del.yaml
+! fwd_exists lo tcp 3006 127.0.0.1 80
+
+# --continue-on-hook-fail makes the same delete exit zero
+exec fwdctl apply --file rules-badhook-del.yaml
+fwd_exists lo tcp 3006 127.0.0.1 80
+exec fwdctl delete --file rules-badhook-del.yaml --continue-on-hook-fail
+! fwd_exists lo tcp 3006 127.0.0.1 80
+
+-- rules-hooks.yaml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+    hooks:
+      on-create: "echo created > oncreate.flag"
+      on-delete: "echo deleted > ondelete.flag"
+
+-- rules-mixed.yaml --
+rules:
+  - dport: 3000
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+    hooks:
+      on-create: "echo created > oncreate.flag"
+  - dport: 3001
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+
+-- rules-badhook.yaml --
+rules:
+  - dport: 3005
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+    hooks:
+      on-create: "exit 1"
+
+-- rules-badhook-del.yaml --
+rules:
+  - dport: 3006
+    saddr: 127.0.0.1
+    sport: 80
+    iface: lo
+    proto: tcp
+    hooks:
+      on-delete: "exit 1"
