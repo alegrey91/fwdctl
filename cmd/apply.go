@@ -23,9 +23,15 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
+	"github.com/alegrey91/fwdctl/internal/hooks"
 	"github.com/alegrey91/fwdctl/internal/rules"
 	iptables "github.com/alegrey91/fwdctl/pkg/iptables"
 )
+
+// continueOnHookFail is shared by the commands that run rule hooks
+// (apply, delete, daemon). When true, a failing hook is logged and
+// execution continues instead of aborting with a non-zero exit code.
+var continueOnHookFail bool
 
 // applyCmd represents the apply command
 var applyCmd = &cobra.Command{
@@ -68,8 +74,15 @@ var applyCmd = &cobra.Command{
 
 		if rulesFileIsValid {
 			for ruleId, rule := range ruleSet.Rules {
+				rule := rule
 				if err := ipt.CreateForward(&rule); err != nil {
 					return fmt.Errorf("applying rule (%s): %v", ruleId, err)
+				}
+				if err := hooks.RunOnCreate(&rule); err != nil {
+					if !continueOnHookFail {
+						return fmt.Errorf("on-create hook for rule (%s): %v", ruleId, err)
+					}
+					fmt.Fprintf(os.Stderr, "ignoring on-create hook failure for rule (%s): %v\n", ruleId, err)
 				}
 			}
 		}
@@ -81,4 +94,5 @@ func init() {
 	rootCmd.AddCommand(applyCmd)
 
 	applyCmd.Flags().StringVarP(&c.RulesFile, "file", "f", "rules.yml", "rules file")
+	applyCmd.Flags().BoolVar(&continueOnHookFail, "continue-on-hook-fail", false, "continue execution when a rule hook fails instead of exiting non-zero")
 }

@@ -22,6 +22,7 @@ import (
 	//"os"
 
 	c "github.com/alegrey91/fwdctl/internal/constants"
+	"github.com/alegrey91/fwdctl/internal/hooks"
 	"github.com/alegrey91/fwdctl/internal/rules"
 	iptables "github.com/alegrey91/fwdctl/pkg/iptables"
 	"github.com/spf13/cobra"
@@ -81,6 +82,7 @@ func init() {
 	deleteCmd.Flags().IntVarP(&ruleId, "id", "n", 0, "delete rules through ID")
 	deleteCmd.Flags().StringVarP(&file, "file", "f", "rules.yml", "delete rules through file")
 	deleteCmd.Flags().BoolP("all", "a", false, "delete all rules")
+	deleteCmd.Flags().BoolVar(&continueOnHookFail, "continue-on-hook-fail", false, "continue execution when a rule hook fails instead of exiting non-zero")
 	deleteCmd.MarkFlagsMutuallyExclusive("id", "file", "all")
 }
 
@@ -94,9 +96,16 @@ func deleteFromFile(ipt *iptables.IPTablesInstance, file string) error {
 		return fmt.Errorf("error instantiating ruleset from file: %v", err)
 	}
 	for _, rule := range rulesFile.Rules {
+		rule := rule
 		err := ipt.DeleteForwardByRule(&rule)
 		if err != nil {
 			return fmt.Errorf("error deleting rule [%s %s %d %s %d]: %v", rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport, err)
+		}
+		if err := hooks.RunOnDelete(&rule); err != nil {
+			if !continueOnHookFail {
+				return fmt.Errorf("on-delete hook for rule [%s %s %d %s %d]: %v", rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport, err)
+			}
+			fmt.Fprintf(os.Stderr, "ignoring on-delete hook failure for rule [%s %s %d %s %d]: %v\n", rule.Iface, rule.Proto, rule.Dport, rule.Saddr, rule.Sport, err)
 		}
 	}
 	return nil

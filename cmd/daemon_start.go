@@ -39,7 +39,11 @@ var daemonStartCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("unable to read from flag: %v", err)
 		}
-		if res := daemon.Start(ipt, rulesFile); res != 0 {
+		continueOnHookFail, err := cmd.Flags().GetBool("continue-on-hook-fail")
+		if err != nil {
+			return fmt.Errorf("unable to read from flag: %v", err)
+		}
+		if res := daemon.Start(ipt, rulesFile, continueOnHookFail); res != 0 {
 			os.Exit(1)
 		}
 		return nil
@@ -49,4 +53,5 @@ var daemonStartCmd = &cobra.Command{
 func init() {
 	daemonCmd.AddCommand(daemonStartCmd)
 	daemonStartCmd.Flags().StringVarP(&c.RulesFile, "file", "f", "rules.yml", "rules file")
+	daemonStartCmd.Flags().Bool("continue-on-hook-fail", false, "continue execution when a rule hook fails instead of shutting down")
 }
