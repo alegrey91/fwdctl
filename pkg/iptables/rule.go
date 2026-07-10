@@ -26,6 +26,18 @@ type Hooks struct {
 	OnDelete string `json:"on-delete,omitempty" yaml:"on-delete,omitempty"`
 }
 
+// HookEnv returns the rule's fields as KEY=VALUE strings to be exposed as
+// environment variables to a hook command.
+func (rule *Rule) HookEnv() []string {
+	return []string{
+		"FWDCTL_IFACE=" + rule.Iface,
+		"FWDCTL_PROTO=" + rule.Proto,
+		"FWDCTL_DPORT=" + strconv.Itoa(rule.Dport),
+		"FWDCTL_SADDR=" + rule.Saddr,
+		"FWDCTL_SPORT=" + strconv.Itoa(rule.Sport),
+	}
+}
+
 func NewRule(iface string, proto string, dport int, saddr string, sport int) *Rule {
 	return &Rule{
 		Iface:   iface,

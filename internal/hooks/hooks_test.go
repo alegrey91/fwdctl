@@ -23,7 +23,7 @@ func TestRun(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Run(tt.command); (err != nil) != tt.wantErr {
+			if err := Run(tt.command, nil); (err != nil) != tt.wantErr {
 				t.Errorf("Run(%q) error = %v, wantErr %v", tt.command, err, tt.wantErr)
 			}
 		})
@@ -33,7 +33,7 @@ func TestRun(t *testing.T) {
 func TestRunSideEffect(t *testing.T) {
 	dir := t.TempDir()
 	flag := filepath.Join(dir, "flag")
-	if err := Run("echo created > " + flag); err != nil {
+	if err := Run("echo created > "+flag, nil); err != nil {
 		t.Fatalf("Run() unexpected error: %v", err)
 	}
 	content, err := os.ReadFile(flag)
@@ -91,5 +91,31 @@ func TestRunOnCreateFailure(t *testing.T) {
 	rule := &iptables.Rule{Hooks: &iptables.Hooks{OnCreate: "exit 1"}}
 	if err := RunOnCreate(rule); err == nil {
 		t.Error("RunOnCreate() with failing hook error = nil, want error")
+	}
+}
+
+func TestRunOnCreateInjectsEnv(t *testing.T) {
+	dir := t.TempDir()
+	out := filepath.Join(dir, "env")
+	rule := &iptables.Rule{
+		Iface: "eth0",
+		Proto: "tcp",
+		Dport: 9090,
+		Saddr: "127.0.0.1",
+		Sport: 8080,
+		Hooks: &iptables.Hooks{
+			OnCreate: "printf '%s\\n' \"$FWDCTL_IFACE\" \"$FWDCTL_PROTO\" \"$FWDCTL_DPORT\" \"$FWDCTL_SADDR\" \"$FWDCTL_SPORT\" > " + out,
+		},
+	}
+	if err := RunOnCreate(rule); err != nil {
+		t.Fatalf("RunOnCreate() error = %v", err)
+	}
+	content, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatalf("reading env file: %v", err)
+	}
+	want := "eth0\ntcp\n9090\n127.0.0.1\n8080\n"
+	if got := string(content); got != want {
+		t.Errorf("injected env = %q, want %q", got, want)
 	}
 }
