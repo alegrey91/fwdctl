@@ -44,8 +44,8 @@ rules:
     iface: eth1
     proto: tcp
     hooks:
-      on-create: "/path/to/on-create-script.sh --port 2022"
-      on-delete: "/path/to/on-delete-script.sh --port 2022"
+      on-create: "/path/to/on-create-script.sh"
+      on-delete: "/path/to/on-delete-script.sh"
 ```
 
 Details:
@@ -67,6 +67,27 @@ Details:
   a rule is removed via a config change or during shutdown. Without
   `--continue-on-hook-fail`, a failing hook makes the daemon tear down its
   forwards and exit non-zero.
+
+Hooks receive the forward's context through the following environment
+variables, so a single script can be reused across rules:
+
+| Variable        | Description                       |
+| --------------- | --------------------------------- |
+| `FWDCTL_IFACE`  | Interface the forward listens on  |
+| `FWDCTL_PROTO`  | Protocol (`tcp`/`udp`)            |
+| `FWDCTL_DPORT`  | Destination (listening) port      |
+| `FWDCTL_SADDR`  | Source (target) address           |
+| `FWDCTL_SPORT`  | Source (target) port              |
+
+Example `on-create` script:
+
+```bash
+#!/usr/bin/env bash
+# This script is executed when a rule is created.
+
+touch /tmp/created.txt
+echo "fwdctl rule $FWDCTL_DPORT <- $FWDCTL_SADDR:$FWDCTL_SPORT created at $(date)" >> /tmp/created.txt
+```
 
 ### Create
 
