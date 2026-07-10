@@ -49,6 +49,9 @@ rules:
     sport:
     iface:
     proto:
+    #hooks:
+    #  on-create: "/path/to/on-create-script.sh"
+    #  on-delete: "/path/to/on-delete-script.sh"
 -- fwdctl-oneshot.service --
 [Unit]
 Description=fwdctl systemd service
